@@ -28,7 +28,7 @@ if "ssl" in query:
     query.pop("ssl")
 
 # ADD correct asyncpg SSL
-query["sslmode"] = ["require"]
+query["ssl"] = ["require"]
 
 
 clean_query = urllib.parse.urlencode(query, doseq=True)
