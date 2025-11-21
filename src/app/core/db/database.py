@@ -10,7 +10,7 @@ from ..config import settings
 class Base(MappedAsDataclass, DeclarativeBase, kw_only=True):
     pass
 
-DATABASE_URI = settings.POSTGRES_URI
+DATABASE_URI = settings.POSTGRES_URL
 DATABASE_PREFIX = settings.POSTGRES_ASYNC_PREFIX
 DATABASE_URL = f"{DATABASE_PREFIX}{DATABASE_URI}"
 
