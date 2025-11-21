@@ -10,11 +10,18 @@ from ..config import settings
 class Base(MappedAsDataclass, DeclarativeBase, kw_only=True):
     pass
 
-DATABASE_URI = settings.DATABASE_URL
-DATABASE_PREFIX = settings.POSTGRES_ASYNC_PREFIX
-DATABASE_URL = f"{DATABASE_PREFIX}{DATABASE_URI}"
-
-# print(f"[DEBUG] Using database URL: {DATABASE_URL}")
+# --- FIX START ---
+# Use POSTGRES_URL directly from the environment
+if settings.POSTGRES_URL:
+    DATABASE_URL = settings.POSTGRES_URL.replace("postgresql://", "postgresql+asyncpg://")
+else:
+    # Build fallback using individual variables
+    DATABASE_URL = (
+        f"postgresql+asyncpg://{settings.POSTGRES_USER}:"
+        f"{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_SERVER}:"
+        f"{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+    )
+# --- FIX END ---
 
 async_engine = create_async_engine(DATABASE_URL, echo=False, future=True)
 
