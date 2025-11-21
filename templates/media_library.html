@@ -1,0 +1,1335 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Media Library{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h1 class="h3 mb-0" style="color: #000;">Media Library</h1>
+            <p class="text-muted mb-0">Upload, organize, and manage your media files</p>
+          </div>
+          <div class="d-flex align-items-center">
+            <span class="badge badge-primary badge-pill mr-3 d-flex align-items-center">
+              <i class="mdi mdi-image-multiple mr-1"></i>
+              <span id="mediaCount">0</span> files
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <form id="uploadForm" enctype="multipart/form-data">
+              <div class="row align-items-end">
+                <div class="col-md-4">
+                  <label for="mediaFile" class="form-label fw-bold text-dark">Select File </label>
+                  <small class="form-text text-muted">JPEG, PNG, GIF, WebP, MP4, AVI, MOV, WMV, FLV (Max 50MB)</small>
+
+                  <div class="custom-file-upload">
+                    <input type="file" class="form-control" id="mediaFile" name="file" accept="image/*,video/*" required onchange="handleFileSelect(this)">
+                    <div class="file-upload-placeholder">
+                      <i class="mdi mdi-cloud-upload text-primary"></i>
+                      <span id="filePlaceholderText">Choose file or drag here</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="mediaTitle" class="form-label fw-bold text-dark">Title</label>
+                  <input type="text" class="form-control" id="mediaTitle" name="title" placeholder="Enter a title" required>
+                </div>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-primary btn-lg w-100" id="uploadBtn">
+                    <i class="mdi mdi-upload mr-2"></i>
+                    Upload Media
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="btn-group" role="group">
+          <button type="button" class="btn btn-outline-primary d-flex align-items-center active" data-filter="all">
+            <i class="mdi mdi-view-grid mr-1"></i>
+            <span>All</span>
+          </button>
+          <button type="button" class="btn btn-outline-primary d-flex align-items-center" data-filter="image">
+            <i class="mdi mdi-image mr-1"></i>
+            <span>Images</span>
+          </button>
+          <button type="button" class="btn btn-outline-primary d-flex align-items-center" data-filter="video">
+            <i class="mdi mdi-video mr-1"></i>
+            <span>Videos</span>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="input-group">
+          <span class="input-group-text bg-white border-end-0">
+            <i class="mdi mdi-magnify text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-start-0" id="searchMedia" placeholder="Search media files...">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Media Gallery -->
+    <div class="row" id="mediaGallery">
+      <!-- Media items will be loaded here -->
+    </div>
+    
+    <!-- Load More Button -->
+    <div class="text-center mt-5" id="loadMoreContainer" style="display: none;">
+      <button class="btn btn-outline-primary btn-lg" id="loadMoreBtn">
+        <i class="mdi mdi-refresh mr-2"></i>Load More
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div class="row" id="emptyState" style="display: none;">
+      <div class="col-12 text-center py-5">
+        <div class="empty-state">
+          <i class="mdi mdi-image-multiple text-muted" style="font-size: 4rem;"></i>
+          <h4 class="mt-3 text-muted">No media files yet</h4>
+          <p class="text-muted">Upload your first image or video to get started</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Media Edit Modal -->
+<div class="modal fade" id="editMediaModal" tabindex="-1" role="dialog" aria-labelledby="editMediaModalLabel">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="editMediaModalLabel">
+          <i class="mdi mdi-pencil mr-2"></i>Edit Media
+        </h5>
+        <button type="button" class="btn-close btn-close-white" onclick="closeEditModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row">
+          <div class="col-md-8">
+            <div id="mediaPreview" class="text-center bg-light rounded p-3" style="min-height: 300px;">
+              <!-- Media preview will be shown here -->
+            </div>
+          </div>
+          <div class="col-md-4">
+            <h6 class="fw-bold mb-3">Edit Tools</h6>
+            
+            <!-- Manual Crop Tool -->
+            <div class="mb-4">
+              <label class="form-label fw-bold">Manual Crop</label>
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="startManualCrop()">
+                  <i class="mdi mdi-crop mr-1"></i>Start Manual Crop
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-sm" onclick="applyManualCrop()" id="applyCropBtn" style="display: none;">
+                  <i class="mdi mdi-check mr-1"></i>Apply Crop
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="cancelCrop()" id="cancelCropBtn" style="display: none;">
+                  <i class="mdi mdi-close mr-1"></i>Cancel Crop
+                </button>
+              </div>
+              <small class="form-text text-muted">Click and drag to select crop area</small>
+            </div>
+            
+            <!-- Video Trim Tool (only for videos) -->
+            <div class="mb-4" id="videoTrimSection" style="display: none;">
+              <label class="form-label fw-bold">Video Trim</label>
+              
+              <!-- Video Timeline -->
+              <div class="video-timeline-container mb-3" id="videoTimelineContainer" style="display: none;">
+                <div class="video-timeline">
+                  <div class="timeline-track">
+                    <div class="timeline-progress" id="timelineProgress"></div>
+                    <div class="timeline-handle timeline-handle-start" id="startHandle" draggable="true"></div>
+                    <div class="timeline-handle timeline-handle-end" id="endHandle" draggable="true"></div>
+                    <div class="timeline-selection" id="timelineSelection"></div>
+                  </div>
+                  <div class="timeline-labels">
+                    <span id="startTimeLabel">0:00</span>
+                    <span id="endTimeLabel">0:00</span>
+                    <span id="durationLabel">Duration: 0:00</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="d-grid gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="startVideoTrim()">
+                  <i class="mdi mdi-video-cut mr-1"></i>Start Video Trim
+                </button>
+              </div>
+              
+              <div class="d-flex gap-2 mt-2" id="trimActionButtons" style="display: none;">
+                <button type="button" class="btn btn-outline-primary btn-sm flex-fill" onclick="applyVideoTrim()" id="applyTrimBtn" style="display: none;">
+                  <i class="mdi mdi-check mr-1"></i>Apply Trim
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-sm flex-fill" onclick="cancelTrim()" id="cancelTrimBtn" style="display: none;">
+                  <i class="mdi mdi-close mr-1"></i>Cancel Trim
+                </button>
+              </div>
+              
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentMediaFile = null;
+let currentOffset = 0;
+const limit = 12;
+
+// authFetch wrapper for automatic redirect on token expiration
+function authFetch(url, options = {}) {
+  // Get token from cookie
+  const token = document.cookie.split('; ').find(row => row.startsWith('access_token='))?.split('=')[1];
+  
+  // Add authorization header
+  const headers = {
+    ...options.headers
+  };
+  
+  // Only set Content-Type if not sending FormData
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
+  // Make the request
+  return fetch(url, {
+    ...options,
+    headers
+  }).then(response => {
+    if (response.status === 401 || response.status === 403) {
+      // Token expired or invalid, redirect to login
+      window.location.href = '/login';
+      throw new Error('Authentication required');
+    }
+    return response;
+  });
+}
+
+// Custom notification functions
+function showCustomNotification(message, type = 'info') {
+  const notification = document.getElementById('customNotification');
+  const messageEl = document.getElementById('notificationMessage');
+  
+  if (notification && messageEl) {
+    messageEl.textContent = message;
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} show`;
+    notification.style.display = 'block';
+  } else {
+    // Fallback to browser alert
+    alert(message);
+  }
+}
+
+function hideCustomNotification() {
+  const notification = document.getElementById('customNotification');
+  if (notification) {
+    notification.style.display = 'none';
+  }
+}
+
+// Loading functions
+function showLoading(message = 'Loading...') {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingMessage = document.getElementById('loadingMessage');
+  
+  if (loadingOverlay && loadingMessage) {
+    loadingMessage.textContent = message;
+    loadingOverlay.style.display = 'flex';
+  }
+}
+
+function hideLoading() {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  if (loadingOverlay) {
+    loadingOverlay.style.display = 'none';
+  }
+}
+
+// Load media files
+async function loadMediaFiles(offset = 0, filter = 'all') {
+  try {
+    showLoading('Loading media files...');
+    
+    const params = new URLSearchParams({
+      limit: limit,
+      offset: offset,
+      _t: Date.now() // Cache busting parameter
+    });
+    
+    if (filter !== 'all') {
+      params.append('file_type', filter);
+    }
+    
+    console.log('Loading media files with params:', params.toString());
+    const response = await authFetch(`/api/v1/media/files?${params}`);
+    const data = await response.json();
+    
+    console.log('Media files response:', data);
+    
+    if (data.status === 'success') {
+      displayMediaFiles(data.media_files, offset === 0);
+      currentOffset = offset + data.media_files.length;
+      
+      // Update media count
+      document.getElementById('mediaCount').textContent = data.media_files.length;
+      
+      // Show/hide load more button
+      document.getElementById('loadMoreContainer').style.display = 
+        data.media_files.length === limit ? 'block' : 'none';
+      
+      // Show/hide empty state
+      document.getElementById('emptyState').style.display = 
+        data.media_files.length === 0 ? 'block' : 'none';
+    }
+    
+    hideLoading();
+  } catch (error) {
+    console.error('Error loading media files:', error);
+    hideLoading();
+    showCustomNotification('Error loading media files', 'error');
+  }
+}
+
+// Display media files in gallery
+function displayMediaFiles(mediaFiles, clearExisting = true) {
+  const gallery = document.getElementById('mediaGallery');
+  
+  if (clearExisting) {
+    gallery.innerHTML = '';
+  }
+  
+  mediaFiles.forEach(media => {
+    const mediaCard = createMediaCard(media);
+    gallery.appendChild(mediaCard);
+  });
+}
+
+// Create media card
+function createMediaCard(media) {
+  const card = document.createElement('div');
+  card.className = 'col-lg-3 col-md-4 col-sm-6 mb-4';
+  
+  const fileSize = formatFileSize(media.file_size);
+  const duration = media.duration ? formatDuration(media.duration) : '';
+  
+  // Use thumbnail if available, otherwise fall back to main image
+  const imageSrc = media.thumbnail_path || media.file_path;
+  
+  card.innerHTML = `
+    <div class="card h-100 media-card border-0 shadow-sm" data-media-id="${media.id}">
+      <div class="media-preview position-relative">
+        ${media.file_type === 'video' ? 
+          `<video src="${media.file_path}" class="card-img-top" style="height: 200px; object-fit: cover;"></video>
+           <div class="position-absolute top-0 end-0 m-2">
+             <span class="badge badge-dark badge-pill">${duration}</span>
+           </div>` :
+          `<img src="${imageSrc}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="${media.title}" onerror="this.src='${media.file_path}'">`
+        }
+        <div class="position-absolute top-0 start-0 m-2">
+          <span class="badge badge-${media.file_type === 'video' ? 'danger' : 'primary'} badge-pill">
+            <i class="mdi mdi-${media.file_type === 'video' ? 'video' : 'image'} mr-1"></i>
+            ${media.file_type.toUpperCase()}
+          </span>
+        </div>
+        <div class="media-hover-overlay">
+          <div class="hover-icons">
+            <button type="button" class="btn btn-light btn-sm hover-icon" onclick="editMedia(${media.id})" title="Edit">
+              <i class="mdi mdi-pencil"></i>
+            </button>
+            <button type="button" class="btn btn-light btn-sm hover-icon" onclick="deleteMedia(${media.id})" title="Delete">
+              <i class="mdi mdi-delete"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-3">
+        <h6 class="card-title mb-2 text-truncate">${media.title || 'Untitled'}</h6>
+        <p class="card-text small text-muted mb-2">${media.description || ''}</p>
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted">${fileSize}</small>
+        </div>
+        ${media.tags && media.tags.length > 0 ? 
+          `<div class="mt-2">${media.tags.map(tag => `<span class="badge badge-light badge-sm mr-1">${tag}</span>`).join('')}</div>` : ''
+        }
+      </div>
+    </div>
+  `;
+  
+  return card;
+}
+
+// Format file size
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Format duration
+function formatDuration(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Upload form handler
+document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  const fileInput = document.getElementById('mediaFile');
+  
+  console.log('Upload form submitted');
+  console.log('File input:', fileInput);
+  console.log('Files selected:', fileInput.files);
+  console.log('FormData entries:');
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value);
+  }
+  
+  if (!fileInput.files[0]) {
+    console.log('No file selected');
+    showCustomNotification('Please select a file', 'error');
+    return;
+  }
+  
+  console.log('File selected:', fileInput.files[0].name, 'Size:', fileInput.files[0].size);
+  
+  try {
+    showLoading('Uploading media file...');
+    
+    const response = await authFetch('/api/v1/media/upload', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      showCustomNotification('Media uploaded successfully!', 'success');
+      this.reset();
+      console.log('Upload successful, reloading media files...');
+      // Small delay to ensure database transaction is committed
+      setTimeout(() => loadMediaFiles(0), 500);
+    } else {
+      showCustomNotification('Upload failed: ' + data.message, 'error');
+    }
+    
+    hideLoading();
+  } catch (error) {
+    console.error('Upload error:', error);
+    hideLoading();
+    showCustomNotification('Upload failed', 'error');
+  }
+});
+
+// Filter buttons
+document.querySelectorAll('[data-filter]').forEach(button => {
+  button.addEventListener('click', function() {
+    document.querySelectorAll('[data-filter]').forEach(btn => btn.classList.remove('active'));
+    this.classList.add('active');
+    
+    const filter = this.getAttribute('data-filter');
+    loadMediaFiles(0, filter);
+  });
+});
+
+// Search functionality
+document.getElementById('searchMedia').addEventListener('input', function() {
+  const searchTerm = this.value.toLowerCase();
+  const mediaCards = document.querySelectorAll('#mediaGallery .card');
+  
+  mediaCards.forEach(card => {
+    const title = card.querySelector('.card-title').textContent.toLowerCase();
+    const description = card.querySelector('.card-text').textContent.toLowerCase();
+    const tags = Array.from(card.querySelectorAll('.badge')).map(badge => badge.textContent.toLowerCase());
+    
+    const matches = title.includes(searchTerm) || 
+                   description.includes(searchTerm) || 
+                   tags.some(tag => tag.includes(searchTerm));
+    
+    card.closest('.col-lg-3').style.display = matches ? 'block' : 'none';
+  });
+});
+
+// Load more button
+document.getElementById('loadMoreBtn').addEventListener('click', function() {
+  const activeFilter = document.querySelector('[data-filter].active').getAttribute('data-filter');
+  loadMediaFiles(currentOffset, activeFilter);
+});
+
+// Edit media
+async function editMedia(mediaId) {
+  try {
+    console.log('[DEBUG] Starting editMedia for ID:', mediaId);
+    const response = await authFetch(`/api/v1/media/files/${mediaId}`);
+    const data = await response.json();
+    
+    console.log('[DEBUG] Edit media response:', data);
+    
+    if (data.status === 'success') {
+      currentMediaFile = data.media_file;
+      console.log('[DEBUG] Current media file:', currentMediaFile);
+      
+      // Show media preview
+      const preview = document.getElementById('mediaPreview');
+      if (currentMediaFile.file_type === 'video') {
+        console.log('[DEBUG] Loading video preview');
+        preview.innerHTML = `<video src="${currentMediaFile.file_path}" controls style="max-width: 100%; max-height: 400px;" class="rounded"></video>`;
+        // Show video trim section for videos
+        document.getElementById('videoTrimSection').style.display = 'block';
+      } else {
+        console.log('[DEBUG] Loading image preview');
+        console.log('[DEBUG] Image path:', currentMediaFile.file_path);
+        // For images, create a proper container with the image
+        preview.innerHTML = `
+          <div style="position: relative; display: flex; align-items: center; justify-content: center; min-height: 300px; border: 2px solid #ddd; padding: 10px; background: #f8f9fa;">
+            <img src="${currentMediaFile.file_path}" 
+                 style="max-width: 100%; max-height: 280px; object-fit: contain; display: block;" 
+                 alt="${currentMediaFile.title}" 
+                 class="rounded"
+                 onload="console.log('Image loaded successfully:', this.naturalWidth, 'x', this.naturalHeight); this.style.border = '2px solid green'; this.style.visibility = 'visible'; console.log('Image element:', this); console.log('Image computed style:', window.getComputedStyle(this));"
+                 onerror="console.error('Image failed to load:', this.src); this.style.border = '2px solid red'; this.style.display = 'none';">
+            <div style="position: absolute; bottom: 10px; left: 10px; right: 10px; font-size: 12px; color: #666; background: rgba(255,255,255,0.9); padding: 5px; border-radius: 4px;">
+              Image: ${currentMediaFile.width}x${currentMediaFile.height} | Size: ${formatFileSize(currentMediaFile.file_size)}
+            </div>
+          </div>
+        `;
+        // Hide video trim section for images
+        document.getElementById('videoTrimSection').style.display = 'none';
+      }
+      
+      // Show modal using vanilla JavaScript
+      const modal = document.getElementById('editMediaModal');
+      // Store the modal instance globally so we can access it later
+      window.editModalInstance = new bootstrap.Modal(modal);
+      window.editModalInstance.show();
+    }
+  } catch (error) {
+    console.error('Error loading media for edit:', error);
+    showCustomNotification('Error loading media file', 'error');
+  }
+}
+
+// Manual crop functionality
+let isCropping = false;
+let cropStartX, cropStartY, cropEndX, cropEndY;
+let cropOverlay = null;
+
+function startManualCrop() {
+  if (!currentMediaFile || currentMediaFile.file_type !== 'image') {
+    showCustomNotification('Manual crop is only available for images', 'error');
+    return;
+  }
+  
+  isCropping = true;
+  document.getElementById('applyCropBtn').style.display = 'block';
+  document.getElementById('cancelCropBtn').style.display = 'block';
+  
+  // Create crop overlay
+  const preview = document.getElementById('mediaPreview');
+  const img = preview.querySelector('img');
+  
+  if (!img) {
+    showCustomNotification('No image found for cropping', 'error');
+    return;
+  }
+  
+  // Create crop overlay
+  cropOverlay = document.createElement('div');
+  cropOverlay.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: crosshair;
+    z-index: 1000;
+  `;
+  
+  preview.style.position = 'relative';
+  preview.appendChild(cropOverlay);
+  
+  // Add event listeners
+  cropOverlay.addEventListener('mousedown', startCropSelection);
+  cropOverlay.addEventListener('mousemove', updateCropSelection);
+  cropOverlay.addEventListener('mouseup', endCropSelection);
+}
+
+function startCropSelection(e) {
+  const rect = cropOverlay.getBoundingClientRect();
+  cropStartX = e.clientX - rect.left;
+  cropStartY = e.clientY - rect.top;
+  
+  // Create selection rectangle
+  const selection = document.createElement('div');
+  selection.id = 'cropSelection';
+  selection.style.cssText = `
+    position: absolute;
+    border: 2px dashed #fff;
+    background: rgba(0, 123, 255, 0.3);
+    z-index: 1001;
+  `;
+  cropOverlay.appendChild(selection);
+}
+
+function updateCropSelection(e) {
+  if (!cropStartX) return;
+  
+  const rect = cropOverlay.getBoundingClientRect();
+  cropEndX = e.clientX - rect.left;
+  cropEndY = e.clientY - rect.top;
+  
+  const selection = document.getElementById('cropSelection');
+  if (selection) {
+    const left = Math.min(cropStartX, cropEndX);
+    const top = Math.min(cropStartY, cropEndY);
+    const width = Math.abs(cropEndX - cropStartX);
+    const height = Math.abs(cropEndY - cropStartY);
+    
+    selection.style.left = left + 'px';
+    selection.style.top = top + 'px';
+    selection.style.width = width + 'px';
+    selection.style.height = height + 'px';
+  }
+}
+
+function endCropSelection() {
+  cropStartX = null;
+  cropStartY = null;
+}
+
+function applyManualCrop() {
+  if (!cropOverlay) {
+    showCustomNotification('No crop selection made', 'error');
+    return;
+  }
+  
+  const selection = document.getElementById('cropSelection');
+  if (!selection) {
+    showCustomNotification('No crop selection found', 'error');
+    return;
+  }
+  
+  // Get crop coordinates
+  const rect = cropOverlay.getBoundingClientRect();
+  const img = cropOverlay.parentElement.querySelector('img');
+  const imgRect = img.getBoundingClientRect();
+  
+  // Calculate crop coordinates relative to image
+  const cropLeft = Math.max(0, (parseInt(selection.style.left) - (imgRect.left - rect.left)) / imgRect.width);
+  const cropTop = Math.max(0, (parseInt(selection.style.top) - (imgRect.top - rect.top)) / imgRect.height);
+  const cropWidth = Math.min(1, parseInt(selection.style.width) / imgRect.width);
+  const cropHeight = Math.min(1, parseInt(selection.style.height) / imgRect.height);
+  
+  // Apply crop
+  applyEditWithParams('crop', {
+    left: Math.round(cropLeft * img.naturalWidth),
+    top: Math.round(cropTop * img.naturalHeight),
+    right: Math.round((cropLeft + cropWidth) * img.naturalWidth),
+    bottom: Math.round((cropTop + cropHeight) * img.naturalHeight)
+  });
+  
+  cancelCrop();
+}
+
+function cancelCrop() {
+  isCropping = false;
+  document.getElementById('applyCropBtn').style.display = 'none';
+  document.getElementById('cancelCropBtn').style.display = 'none';
+  
+  if (cropOverlay) {
+    cropOverlay.remove();
+    cropOverlay = null;
+  }
+}
+
+// Video trim functionality
+let isTrimming = false;
+let trimStart = 0;
+let trimEnd = 0;
+let videoDuration = 0;
+let timelineWidth = 0;
+
+function startVideoTrim() {
+  if (!currentMediaFile || currentMediaFile.file_type !== 'video') {
+    showCustomNotification('Video trim is only available for videos', 'error');
+    return;
+  }
+  
+  isTrimming = true;
+  document.getElementById('trimActionButtons').style.display = 'flex';
+  document.getElementById('applyTrimBtn').style.display = 'block';
+  document.getElementById('cancelTrimBtn').style.display = 'block';
+  document.getElementById('videoTimelineContainer').style.display = 'block';
+  
+  const video = document.querySelector('#mediaPreview video');
+  if (video) {
+    // Wait for video metadata to load
+    if (video.readyState >= 1) {
+      initializeTimeline(video);
+    } else {
+      video.addEventListener('loadedmetadata', () => initializeTimeline(video));
+    }
+  }
+}
+
+function initializeTimeline(video) {
+  videoDuration = video.duration || 0;
+  trimStart = 0;
+  trimEnd = videoDuration;
+  
+  const timelineTrack = document.querySelector('.timeline-track');
+  timelineWidth = timelineTrack.offsetWidth;
+  
+  // Set initial positions
+  updateTimelineHandles();
+  updateTimeLabels();
+  
+  // Add drag event listeners
+  const startHandle = document.getElementById('startHandle');
+  const endHandle = document.getElementById('endHandle');
+  
+  startHandle.addEventListener('dragstart', handleDragStart);
+  startHandle.addEventListener('drag', handleDrag);
+  startHandle.addEventListener('dragend', handleDragEnd);
+  
+  endHandle.addEventListener('dragstart', handleDragStart);
+  endHandle.addEventListener('drag', handleDrag);
+  endHandle.addEventListener('dragend', handleDragEnd);
+  
+  // Add click event for timeline
+  timelineTrack.addEventListener('click', handleTimelineClick);
+  
+  showCustomNotification('Drag the handles to set start and end points', 'info');
+}
+
+function handleDragStart(e) {
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', e.target.outerHTML);
+}
+
+function handleDrag(e) {
+  if (e.clientX === 0) return; // Ignore invalid drag events
+  
+  const timelineTrack = document.querySelector('.timeline-track');
+  const rect = timelineTrack.getBoundingClientRect();
+  const x = Math.max(0, Math.min(e.clientX - rect.left, timelineWidth));
+  const time = (x / timelineWidth) * videoDuration;
+  
+  if (e.target.id === 'startHandle') {
+    // Constrain start handle to be before end handle with minimum gap
+    const maxStartTime = trimEnd - 1; // At least 1 second gap
+    trimStart = Math.max(0, Math.min(time, maxStartTime));
+  } else if (e.target.id === 'endHandle') {
+    // Constrain end handle to be after start handle with minimum gap
+    const minEndTime = trimStart + 1; // At least 1 second gap
+    trimEnd = Math.max(minEndTime, Math.min(time, videoDuration));
+  }
+  
+  updateTimelineHandles();
+  updateTimeLabels();
+}
+
+function handleDragEnd(e) {
+  // Update video preview to show trimmed section
+  const video = document.querySelector('#mediaPreview video');
+  if (video) {
+    video.currentTime = trimStart;
+  }
+}
+
+function handleTimelineClick(e) {
+  if (!isTrimming) return;
+  
+  const timelineTrack = document.querySelector('.timeline-track');
+  const rect = timelineTrack.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const time = (x / timelineWidth) * videoDuration;
+  
+  // Set the time to the clicked position
+  const video = document.querySelector('#mediaPreview video');
+  if (video) {
+    video.currentTime = time;
+  }
+}
+
+function updateTimelineHandles() {
+  const startHandle = document.getElementById('startHandle');
+  const endHandle = document.getElementById('endHandle');
+  const selection = document.getElementById('timelineSelection');
+  
+  const startPos = (trimStart / videoDuration) * 100;
+  const endPos = (trimEnd / videoDuration) * 100;
+  
+  startHandle.style.left = startPos + '%';
+  endHandle.style.left = endPos + '%';
+  
+  selection.style.left = startPos + '%';
+  selection.style.width = (endPos - startPos) + '%';
+}
+
+function updateTimeLabels() {
+  document.getElementById('startTimeLabel').textContent = formatTime(trimStart);
+  document.getElementById('endTimeLabel').textContent = formatTime(trimEnd);
+  document.getElementById('durationLabel').textContent = `Duration: ${formatTime(trimEnd - trimStart)}`;
+}
+
+function formatTime(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = Math.floor(seconds % 60);
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+function applyVideoTrim() {
+  if (!isTrimming) {
+    showCustomNotification('No trim selection made', 'error');
+    return;
+  }
+  
+  if (trimEnd - trimStart < 1) {
+    showCustomNotification('Trim selection must be at least 1 second', 'error');
+    return;
+  }
+  
+  // Apply video trim
+  applyEditWithParams('trim', {
+    start_time: trimStart,
+    end_time: trimEnd
+  });
+  
+  cancelTrim();
+}
+
+function cancelTrim() {
+  isTrimming = false;
+  document.getElementById('trimActionButtons').style.display = 'none';
+  document.getElementById('applyTrimBtn').style.display = 'none';
+  document.getElementById('cancelTrimBtn').style.display = 'none';
+  document.getElementById('videoTimelineContainer').style.display = 'none';
+  trimStart = 0;
+  trimEnd = 0;
+  videoDuration = 0;
+}
+
+// Save all edits
+function saveEdits() {
+  showCustomNotification('No edits to save. Use the crop or trim tools first.', 'info');
+}
+
+
+
+// Helper function to close the edit modal
+function closeEditModal() {
+  if (window.editModalInstance) {
+    window.editModalInstance.hide();
+  } else {
+    // Fallback: try to get instance from DOM
+    const modal = document.getElementById('editMediaModal');
+    if (modal) {
+      let bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (!bootstrapModal) {
+        bootstrapModal = new bootstrap.Modal(modal);
+      }
+      bootstrapModal.hide();
+    }
+  }
+}
+
+// Helper function to apply edit with specific parameters
+async function applyEditWithParams(editType, editParams) {
+  try {
+    showLoading('Applying edit...');
+    
+    const formData = new FormData();
+    formData.append('edit_type', editType);
+    formData.append('edit_params', JSON.stringify(editParams));
+    
+    console.log('[DEBUG] Sending edit request with params:', editType, editParams);
+    const response = await authFetch(`/api/v1/media/files/${currentMediaFile.id}/edit`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await response.json();
+    console.log('[DEBUG] Edit response:', data);
+    
+    if (data.status === 'success') {
+      showCustomNotification('Edit applied successfully!', 'success');
+      closeEditModal(); // Close the modal
+      loadMediaFiles(0); // Reload gallery
+    } else {
+      showCustomNotification('Edit failed: ' + data.message, 'error');
+    }
+    
+    hideLoading();
+  } catch (error) {
+    console.error('Edit error:', error);
+    hideLoading();
+    showCustomNotification('Edit failed', 'error');
+  }
+}
+
+// Delete media
+async function deleteMedia(mediaId) {
+  event.preventDefault();
+  showCustomConfirm(
+    'Are you sure you want to delete this media file? This action cannot be undone.',
+    function() {
+      actuallyDeleteMedia(mediaId);
+    },
+    function() {
+      // User cancelled, do nothing
+    }
+  );
+  return false;
+}
+
+async function actuallyDeleteMedia(mediaId) {
+  try {
+    showLoading('Deleting media file...');
+    
+    const response = await authFetch(`/api/v1/media/files/${mediaId}`, {
+      method: 'DELETE'
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      showCustomNotification('Media file deleted successfully!', 'success');
+      console.log('Delete successful, reloading media files...');
+      // Small delay to ensure database transaction is committed
+      setTimeout(() => loadMediaFiles(0), 500);
+    } else {
+      showCustomNotification('Delete failed: ' + data.message, 'error');
+    }
+    
+    hideLoading();
+  } catch (error) {
+    console.error('Delete error:', error);
+    hideLoading();
+    showCustomNotification('Delete failed', 'error');
+  }
+}
+
+// Handle file selection for custom file upload
+function handleFileSelect(input) {
+  console.log('File input changed:', input);
+  console.log('Files selected:', input.files);
+  
+  const filePlaceholderText = document.getElementById('filePlaceholderText');
+  if (input.files && input.files[0]) {
+    console.log('Selected file:', input.files[0].name, 'Size:', input.files[0].size);
+    filePlaceholderText.textContent = input.files[0].name;
+  } else {
+    console.log('No file selected');
+    filePlaceholderText.textContent = 'Choose file or drag here';
+  }
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  loadMediaFiles(0);
+});
+</script>
+
+<style>
+/* Custom file upload styling */
+.custom-file-upload {
+  position: relative;
+  overflow: hidden;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  height: 38px; /* Match Bootstrap form-control height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-file-upload:hover {
+  border-color: #007bff;
+  background-color: #f8f9fa;
+}
+
+.custom-file-upload input[type="file"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-upload-placeholder {
+  padding: 0.375rem 0.75rem; /* Match Bootstrap form-control padding */
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.875rem; /* Match Bootstrap form-control font size */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.file-upload-placeholder i {
+  font-size: 1rem;
+  margin: 0;
+  display: inline;
+}
+
+/* Media preview styling */
+.media-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px 8px 0 0;
+}
+
+.media-preview img,
+.media-preview video {
+  transition: transform 0.3s ease;
+}
+
+.media-preview:hover img,
+.media-preview:hover video {
+  transform: scale(1.05);
+}
+
+/* Badge styling */
+.badge {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.badge-pill {
+  border-radius: 50rem;
+}
+
+.badge-sm {
+  font-size: 0.6rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Form range styling */
+.form-range {
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+}
+
+.form-range::-webkit-slider-thumb {
+  background: #007bff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+}
+
+.form-range::-moz-range-thumb {
+  background: #007bff;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  border: none;
+}
+
+/* Media hover overlay */
+.media-hover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.media-card:hover .media-hover-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.hover-icons {
+  display: flex;
+  gap: 12px;
+}
+
+.hover-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hover-icon:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.hover-icon i {
+  font-size: 18px;
+  color: #333;
+}
+
+.hover-icon:first-child {
+  color: #007bff;
+}
+
+.hover-icon:last-child {
+  color: #dc3545;
+}
+
+/* Card styling */
+.media-card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.media-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-title {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Button styling */
+.btn-group .btn {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.btn-group .btn.active {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+/* Input group styling */
+.input-group-text {
+  border-radius: 6px 0 0 6px;
+}
+
+.input-group .form-control {
+  border-radius: 0 6px 6px 0;
+}
+
+/* Modal styling */
+.modal-content {
+  border-radius: 12px;
+}
+
+.modal-header {
+  border-radius: 12px 12px 0 0;
+}
+
+/* Empty state styling */
+.empty-state {
+  padding: 3rem;
+}
+
+.empty-state i {
+  opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .col-lg-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 576px) {
+  .col-lg-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    border-radius: 6px !important;
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Fix for textarea text color when focused */
+textarea.form-control:focus {
+  color: #ffffff !important;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Video Timeline Styles */
+.video-timeline-container {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid #dee2e6;
+}
+
+.video-timeline {
+  position: relative;
+}
+
+.timeline-track {
+  position: relative;
+  height: 40px;
+  background: #e9ecef;
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: 2px solid #dee2e6;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.timeline-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  width: 0%;
+  transition: width 0.1s ease;
+}
+
+.timeline-handle {
+  position: absolute;
+  top: -8px;
+  width: 12px;
+  height: 56px;
+  background: #fff;
+  border: 3px solid #007bff;
+  border-radius: 6px;
+  cursor: grab;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.timeline-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 20px;
+  background: #007bff;
+}
+
+.timeline-handle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: #0056b3;
+}
+
+.timeline-handle:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+.timeline-handle-start {
+  left: 0%;
+}
+
+.timeline-handle-end {
+  left: 100%;
+}
+
+.timeline-selection {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0, 123, 255, 0.4);
+  border: 2px solid #007bff;
+  
+  pointer-events: none;
+  z-index: 5;
+  box-shadow: inset 0 0 8px rgba(0, 123, 255, 0.3);
+}
+
+.timeline-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.timeline-labels span {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 8px;
+  border: 1px solid #dee2e6;
+}
+
+#durationLabel {
+  font-weight: 600;
+  color: #007bff;
+}
+</style>
+{% endblock %} 

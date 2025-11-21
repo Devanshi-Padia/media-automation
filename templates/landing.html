@@ -1,0 +1,11 @@
+{% extends 'layouts/base-guest.html' %}
+{% block title %}Landing - Social Media Scheduler{% endblock %}
+{% block content %}
+<div style="position: absolute; top: 2rem; right: 3rem; display: flex; gap: 1.5rem;">
+    <a href="{{ url_for('login') }}" class="btn btn-lg" style="background: #b3c6f7; color: #222; border-radius: 12px; min-width: 120px; font-weight: 600;">Login</a>
+    <a href="{{ url_for('register') }}" class="btn btn-lg" style="background: #b3c6f7; color: #222; border-radius: 12px; min-width: 120px; font-weight: 600;">Sign Up</a>
+</div>
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 80vh;">
+    <h1 class="text-center mb-5" style="font-size:3rem; font-weight:900; color:#1a237e; letter-spacing:2px; text-shadow: 0 2px 16px #fff8, 0 1px 4px #7f9cf5cc;">SOCIAL MEDIA CONTENT GENERATOR</h1>
+</div>
+{% endblock %} 

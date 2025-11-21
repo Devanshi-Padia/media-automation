@@ -1,0 +1,211 @@
+{% extends 'layouts/base-guest.html' %}
+{% block title %}Register {% endblock %}
+
+{% block stylesheets %}
+<style>
+/* CRITICAL FIX: Force dark text on white background for all inputs */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+.form-control,
+.p_input {
+    color: #2c3e50 !important;
+    -webkit-text-fill-color: #2c3e50 !important;
+    background-color: #ffffff !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+/* Force dark text when focused */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+.form-control:focus,
+.p_input:focus {
+    color: #2c3e50 !important;
+    -webkit-text-fill-color: #2c3e50 !important;
+    background-color: #ffffff !important;
+}
+
+/* Force dark text when active */
+input[type="text"]:active,
+input[type="password"]:active,
+input[type="email"]:active,
+input[type="number"]:active,
+.form-control:active,
+.p_input:active {
+    color: #2c3e50 !important;
+    -webkit-text-fill-color: #2c3e50 !important;
+    background-color: #ffffff !important;
+}
+
+/* Override autofill styling */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #2c3e50 !important;
+    transition: background-color 5000s ease-in-out 0s;
+    color: #2c3e50 !important;
+    background-color: #ffffff !important;
+}
+
+/* Ensure placeholder text is visible */
+input::placeholder,
+.form-control::placeholder,
+.p_input::placeholder {
+    color: #6c757d !important;
+    opacity: 0.7;
+}
+
+/* Override any existing white text rules */
+* {
+    --input-text-color: #2c3e50 !important;
+    --input-bg-color: #ffffff !important;
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="container-scroller">
+  <div class="container-fluid page-body-wrapper full-page-wrapper">
+    <div class="content-wrapper d-flex align-items-center auth px-0">
+      <div class="row w-100 mx-0">
+        <div class="col-lg-4 mx-auto">
+          <div class="auth-form-light text-left">
+            <div class="brand-logo text-center">
+              <div class="mb-2">
+                <i class="mdi mdi-view-dashboard" style="font-size: 2rem; color: #6f42c1;"></i>
+              </div>
+              <h2 class="mb-0">Media Creator</h2>
+            </div>
+            
+            <div class="text-center mb-2">
+              <h4 class="mb-1" style="font-size: 1.2rem;">Join us today!</h4>
+              <h6 class="font-weight-light" style="font-size: 0.9rem;">Create your account to get started.</h6>
+            </div>
+            
+            {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <div class="d-flex align-items-center">
+                <i class="mdi mdi-alert-circle mr-2"></i>
+                <span>{{ error }}</span>
+              </div>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            {% endif %}
+            
+            <form method="post" class="pt-1">
+              <!-- Hidden fields to trick autofill -->
+              <input type="text" style="display:none;" autocomplete="username">
+              <input type="password" style="display:none;" autocomplete="current-password">
+              
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="Enter your full name" required 
+                       autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly'); this.value='';" 
+                       style="color: #2c3e50 !important; -webkit-text-fill-color: #2c3e50 !important; background-color: #ffffff !important;">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" name="username" id="username" class="form-control" placeholder="Choose a username" required 
+                       autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly'); this.value='';" 
+                       style="color: #2c3e50 !important; -webkit-text-fill-color: #2c3e50 !important; background-color: #ffffff !important;">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email" required 
+                       autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly'); this.value='';" 
+                       style="color: #2c3e50 !important; -webkit-text-fill-color: #2c3e50 !important; background-color: #ffffff !important;">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Create a password" required 
+                       autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly'); this.value='';" 
+                       style="color: #2c3e50 !important; -webkit-text-fill-color: #2c3e50 !important; background-color: #ffffff !important;">
+              </div>
+              
+              <div class="form-group" style="margin-bottom: 0.6rem;">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Confirm your password" required 
+                       autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly'); this.value='';" 
+                       style="color: #2c3e50 !important; -webkit-text-fill-color: #2c3e50 !important; background-color: #ffffff !important;">
+              </div>
+              
+              <div class="mb-2">
+                <div class="form-check">
+                  <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" required>
+                    <span class="form-check-sign">I agree to the <a href="#" class="text-primary">Terms & Conditions</a></span>
+                  </label>
+                </div>
+              </div>
+              
+              <div class="mt-2">
+                <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">
+                  <i class="mdi mdi-account-plus mr-2"></i>CREATE ACCOUNT
+                </button>
+              </div>
+              
+              <div class="text-center mt-2">
+                <span class="font-weight-light">Already have an account?</span>
+                <a href="{{ url_for('login') }}" class="text-primary font-weight-medium">Sign in</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Clear all form fields on page load
+  const allInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+  
+  allInputs.forEach(input => {
+    // Set autocomplete to new-password to prevent autofill
+    input.setAttribute('autocomplete', 'new-password');
+    
+    // Clear any autofilled values
+    if (input.value) {
+      input.value = '';
+    }
+    
+    // Add focus event to clear field if it gets autofilled
+    input.addEventListener('focus', function() {
+      this.removeAttribute('readonly');
+      if (this.value && this.value !== '') {
+        this.value = '';
+      }
+    });
+    
+    // Prevent autofill on input
+    input.addEventListener('input', function() {
+      this.setAttribute('autocomplete', 'new-password');
+    });
+  });
+  
+  // Additional prevention for password fields
+  const passwordFields = document.querySelectorAll('input[type="password"]');
+  passwordFields.forEach(field => {
+    field.addEventListener('focus', function() {
+      this.removeAttribute('readonly');
+      if (this.value && this.value !== '') {
+        this.value = '';
+      }
+    });
+  });
+});
+</script> 

@@ -1,0 +1,746 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Plugin CSS goes HERE -->
+{% block plugin_stylesheets %}
+  {{ super() }}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+{% endblock plugin_stylesheets %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}
+<style>
+.blurred {
+  filter: blur(8px);
+  pointer-events: none;
+  user-select: none;
+}
+.fc-event, .fc-event .fc-content {
+  background: transparent !important;
+  border: none !important;
+  color: #222 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fc-event .fc-title {
+  display: none !important;
+}
+
+/* Project History Table Styles */
+.table-container {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.table-container table {
+  width: 100%;
+  table-layout: fixed;
+  word-wrap: break-word;
+}
+
+.table-container th,
+.table-container td {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  padding: 8px 4px;
+  font-size: 0.875rem;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-container td {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Ensure social media text doesn't overflow and words don't break */
+.table-container td:nth-child(2) {
+  font-size: 0.8rem;
+  word-break: break-all;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Project name column */
+.table-container td:first-child {
+  max-width: 90px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.75rem;
+}
+
+/* Social media column */
+.table-container td:nth-child(2) {
+  font-size: 0.75rem;
+  word-break: break-all;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  max-width: 100px;
+  min-height: 40px;
+  vertical-align: top;
+  padding-top: 20px;
+  line-height: 1.2;
+  text-align: left;
+}
+
+/* Status column */
+.table-container td:last-child {
+  max-width: 150px;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: 100px;
+}
+
+/* Status badge styling */
+.table-container .badge {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.68rem;
+  padding: 4px 2px;
+}
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<div class="content-wrapper">
+  
+
+  <div class="row">
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+      <div class="card stats-card weekly-sales">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-9">
+              <div class="d-flex align-items-center align-self-start">
+                <h3 class="mb-0 card-value">{{ total_projects }}</h3>
+              </div>
+            </div>
+          </div>
+          <h6 class="text-muted font-weight-normal">Created Projects</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+      <div class="card stats-card weekly-orders">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-9">
+              <div class="d-flex align-items-center align-self-start">
+                <h3 class="mb-0 card-value">{{ scheduled_projects }}</h3>
+              </div>
+            </div>
+          </div>
+          <h6 class="text-muted font-weight-normal">Scheduled Projects</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+      <div class="card stats-card visitors-online">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-9">
+              <div class="d-flex align-items-center align-self-start">
+                <h3 class="mb-0 card-value">{{ posted_projects }}</h3>
+              </div>
+            </div>
+          </div>
+          <h6 class="text-muted font-weight-normal">Posted Projects</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+      <div class="card stats-card">
+        <div class="card-body">
+          <div class="row">
+            <div class="col-9">
+              <div class="d-flex align-items-center align-self-start">
+                <h3 class="mb-0 card-value">{{ failed_projects }}</h3>
+              </div>
+            </div>
+          </div>
+          <h6 class="text-muted font-weight-normal">Failed Projects</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex flex-row justify-content-between">
+            <h4 class="card-title mb-1">Projects</h4>
+            <div>
+              <button id="prevPageBtn" class="btn btn-sm btn-outline-primary">&lt;</button>
+              <span id="pageIndicator" class="mx-2">1</span>
+              <button id="nextPageBtn" class="btn btn-sm btn-outline-primary">&gt;</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="preview-list" id="openProjectsContainer">
+                <!-- JS will populate 5 projects here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <h4 class="card-title">Project History</h4>
+          <div class="d-flex flex-row justify-content-between mb-2">
+            <div>
+              <button id="fixStatusBtn" class="btn btn-sm btn-warning">Update Status</button>
+            </div>
+            <div>
+              <button id="prevHistoryPageBtn" class="btn btn-sm btn-outline-primary">&lt;</button>
+              <span id="historyPageIndicator" class="mx-2">1</span>
+              <button id="nextHistoryPageBtn" class="btn btn-sm btn-outline-primary">&gt;</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th style="width: 25%;">Project Name</th>
+                  <th style="width: 55%;">Social Medias</th>
+                  <th style="width: 20%;">Status</th>
+                </tr>
+              </thead>
+              <tbody id="projectHistoryTable">
+                <!-- JS will populate -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <h4 class="card-title">Project Schedule</h4>
+          <div id="calendar"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+{% if not current_user.is_authenticated %}
+  <!-- Login Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loginModalLabel">Sign In</h5>
+        </div>
+        <div class="modal-body">
+          <form role="form" method="post" action="{{ url_for('authentication_blueprint.login') }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+              <label>Username</label>
+              {{ form.username(placeholder="Username", class="form-control p_input") }}
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              {{ form.password(placeholder="Password", class="form-control p_input", type="password") }}
+            </div>
+            <div class="form-group d-flex align-items-center justify-content-between">
+              <div class="form-check">
+                <label class="form-check-label">
+                  <input type="checkbox" class="form-check-input" checked> Remember me </label>
+              </div>
+              <a href="{{ url_for('authentication_blueprint.register') }}" class="forgot-pass">Create Account</a>
+            </div>
+            <div class="text-center">
+              <button type="submit" name="login" class="btn btn-primary btn-block enter-btn">Login</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      $('#loginModal').modal({backdrop: 'static', keyboard: false});
+      $('#loginModal').modal('show');
+    }
+  </script>
+  {% endif %}
+  {% block javascripts %}
+  <script>
+function authFetch(url, options = {}) {
+  return fetch(url, options).then(response => {
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = '/login';
+      return Promise.reject(new Error('Session expired. Redirecting to login.'));
+    }
+    return response;
+  });
+}
+$(document).ready(function() {
+  const API_BASE = 'http://127.0.0.1:8000/api/v1';
+  // Project search form handler
+  $('#projectSearchInput').on('input', function() {
+    const query = $(this).val().trim();
+    if (!query) {
+      // If search box is empty, reload all projects for the current page
+      fetchProjects(currentPage);
+      return;
+    }
+    authFetch(`${API_BASE}/projects/search?q=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        const projects = data.projects || [];
+        const container = document.getElementById('openProjectsContainer');
+        container.innerHTML = '';
+        projects.forEach(project => {
+          const div = document.createElement('div');
+          div.className = 'preview-item border-bottom';
+          div.innerHTML = `
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-primary">
+                <i class="mdi mdi-file-document"></i>
+              </div>
+            </div>
+            <div class="preview-item-content d-sm-flex flex-grow">
+              <div class="flex-grow">
+                <h6 class="preview-subject">${project.name}</h6>
+              </div>
+              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                <a href="http://127.0.0.1:8000/v1/projects/${project.id}/review" class="btn btn-sm btn-info">Review</a>
+              </div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      });
+  });
+  // Fetch scheduled posts and render on calendar
+  authFetch(API_BASE + '/scheduled_posts')
+    .then(res => res.json())
+    .then(data => {
+      let posts = Array.isArray(data) ? data : data.items;
+      if (!Array.isArray(posts)) posts = [];
+      // Group events by date
+      const eventsByDate = {};
+      posts.forEach(post => {
+        const date = moment(post.scheduled_time || post.time || post.date).format('YYYY-MM-DD');
+        if (!eventsByDate[date]) eventsByDate[date] = [];
+        eventsByDate[date].push(post.project_name || post.name || post.post_id || 'Scheduled');
+      });
+
+      // Create one event per date with all project names in the title
+      const events = Object.keys(eventsByDate).map(date => ({
+        title: eventsByDate[date].join(', '),
+        start: date
+      }));
+
+      $('#calendar').fullCalendar({
+        height: 'auto',
+        fixedWeekCount: false,
+        events: events,
+        eventRender: function(event, element) {
+          // Show only an icon
+          element.html('<span style="font-size:1.5em;">📅</span>');
+          // Tooltip with all project names for this day
+          element.attr('title', event.title);
+        }
+      });
+    })
+    .catch(error => {
+      if (error.message === 'Session expired. Redirecting to login.') {
+        // No action needed, redirect is handled by authFetch
+      } else {
+        // Fallback: just render empty calendar
+        $('#calendar').fullCalendar({
+          height: 'auto',
+          fixedWeekCount: false,
+          events: []
+        });
+      }
+    });
+});
+</script>
+<script>
+const API_BASE = 'http://127.0.0.1:8000/api/v1';
+let currentPage = 1;
+const perPage = 5;
+let historyCurrentPage = 1;
+const historyPerPage = 5;
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if this is a forced refresh (e.g., after deletion)
+  const urlParams = new URLSearchParams(window.location.search);
+  const isRefresh = urlParams.get('refresh');
+  
+  if (isRefresh) {
+    // Clear any cached data and force fresh load
+    console.log('Force refreshing dashboard data...');
+    // Clear the refresh parameter from URL without reloading
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+  
+  authFetch(`${API_BASE}/user/me`)
+  .then(res => {
+    if (!res.ok) {
+      if (res.status === 401) {
+        window.location.href = '/login'; 
+      }
+      throw new Error('Could not fetch user');
+    }
+    return res.json();
+  })
+  .then(user => {
+    // Add cache-busting parameter to prevent stale data
+    const cacheBuster = '&_t=' + new Date().getTime();
+    return authFetch(`${API_BASE}/projects?page=` + currentPage + '&per_page=' + perPage + cacheBuster);
+  })
+  .then(res => res.json())
+  .then(data => {
+    const projects = data.projects || data;
+    if (!Array.isArray(projects)) {
+      console.error("API did not return an array:", data);
+      return;
+    }
+    const container = document.getElementById('openProjectsContainer');
+    if (container) {
+      container.innerHTML = '';
+      projects.forEach(project => {
+        const div = document.createElement('div');
+        div.className = 'preview-item border-bottom'; 
+        div.innerHTML = `
+          <div class="preview-thumbnail">
+            <div class="preview-icon bg-primary">
+              <i class="mdi mdi-file-document"></i>
+            </div>
+          </div>
+          <div class="preview-item-content d-sm-flex flex-grow">
+            <div class="flex-grow">
+              <h6 class="preview-subject">${project.name}</h6>
+            </div>
+            <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+              <a href="http://127.0.0.1:8000/api/v1/projects/${project.id}/review" class="btn btn-sm btn-info">Review</a>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+  })
+  .catch(error => {
+    console.error("Dashboard loading error:", error);
+  });
+
+function fetchProjects(page = 1) {
+  // Add cache-busting parameter to prevent stale data
+  const cacheBuster = '&_t=' + new Date().getTime();
+  authFetch(`${API_BASE}/projects?page=${page}&per_page=${perPage}${cacheBuster}`)
+    .then(res => res.json())
+    .then(data => {
+      const projects = data.projects || data;
+      const total = data.total || projects.length;
+      const totalPages = Math.ceil(total / perPage);
+      const container = document.getElementById('openProjectsContainer');
+      container.innerHTML = '';
+      projects.forEach(project => {
+        const div = document.createElement('div');
+        div.className = 'preview-item border-bottom';
+        div.innerHTML = `
+          <div class="preview-thumbnail">
+            <div class="preview-icon bg-primary">
+              <i class="mdi mdi-file-document"></i>
+            </div>
+          </div>
+          <div class="preview-item-content d-sm-flex flex-grow">
+            <div class="flex-grow">
+              <h6 class="preview-subject">${project.name}</h6>
+            </div>
+            <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+              <a href="http://127.0.0.1:8000/api/v1/projects/${project.id}/review" class="btn btn-sm btn-info">Review</a>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      document.getElementById('pageIndicator').textContent = page;
+      // Disable next button if on last page
+      document.getElementById('nextPageBtn').disabled = (page >= totalPages);
+      // Disable prev button if on first page
+      document.getElementById('prevPageBtn').disabled = (page <= 1);
+    });
+}
+
+// Attach the input handler after fetchProjects is defined
+$('#projectSearchInput').on('input', function() {
+  const query = $(this).val().trim();
+  if (!query) {
+    // If search box is empty, reset to page 1 and reload all projects
+    currentPage = 1;
+    fetchProjects(currentPage);
+    return;
+  }
+  // Add cache-busting parameter to prevent stale data
+  const cacheBuster = '&_t=' + new Date().getTime();
+  authFetch(`${API_BASE}/projects/search?q=${encodeURIComponent(query)}${cacheBuster}`)
+    .then(res => res.json())
+    .then(data => {
+      const projects = data.projects || [];
+      const container = document.getElementById('openProjectsContainer');
+      container.innerHTML = '';
+      projects.forEach(project => {
+        const div = document.createElement('div');
+        div.className = 'preview-item border-bottom';
+        div.innerHTML = `
+          <div class="preview-thumbnail">
+            <div class="preview-icon bg-primary">
+              <i class="mdi mdi-file-document"></i>
+            </div>
+          </div>
+          <div class="preview-item-content d-sm-flex flex-grow">
+            <div class="flex-grow">
+              <h6 class="preview-subject">${project.name}</h6>
+            </div>
+            <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+              <a href="http://127.0.0.1:8000/v1/projects/${project.id}/review" class="btn btn-sm btn-info">Review</a>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    });
+});
+
+document.getElementById('prevPageBtn').onclick = () => {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchProjects(currentPage);
+  }
+};
+document.getElementById('nextPageBtn').onclick = () => {
+  currentPage++;
+  fetchProjects(currentPage);
+};
+
+fetchProjects(currentPage);
+
+function fetchProjectHistory(page = 1) {
+  // Add cache-busting parameter to prevent stale data
+  const cacheBuster = '&_t=' + new Date().getTime();
+  authFetch(`${API_BASE}/projects/history?page=${page}&per_page=${historyPerPage}${cacheBuster}`)
+    .then(res => res.json())
+    .then(data => {
+      const projects = data.projects || data;
+      const total = data.total || projects.length;
+      const totalPages = Math.ceil(total / historyPerPage);
+      const table = document.getElementById('projectHistoryTable');
+      table.innerHTML = '';
+      projects.forEach(project => {
+        // Convert status to lowercase for case-insensitive comparison
+        const statusLower = project.status ? project.status.toLowerCase() : '';
+        const statusClass = statusLower === "approved" || statusLower === "posted" || statusLower === "completed"
+          ? "badge-outline-success"
+          : statusLower === "pending"
+            ? "badge-outline-warning"
+            : statusLower === "rejected" || statusLower === "failed"
+              ? "badge-outline-danger"
+              : statusLower === "partial"
+                ? "badge-outline-dark"
+                : "badge-outline-secondary";
+        // Determine display status
+        let displayStatus;
+        if (statusLower === "pending") {
+          displayStatus = "Scheduled";
+        } else if (
+          statusLower === "posted" ||
+          statusLower === "approved" ||
+          statusLower === "completed" ||
+          statusLower === "rejected" ||
+          statusLower === "failed" ||
+          statusLower === "partial"
+        ) {
+          displayStatus = project.status;
+        } else {
+          displayStatus = "Created";
+        }
+        table.innerHTML += `
+          <tr>
+            <td>${project.name}</td>
+            <td>${project.social_medias || ''}</td>
+            <td><div class="badge ${statusClass}">${displayStatus}</div></td>
+          </tr>
+        `;
+      });
+      document.getElementById('historyPageIndicator').textContent = page;
+      // Disable next button if on last page
+      document.getElementById('nextHistoryPageBtn').disabled = (page >= totalPages);
+      // Disable prev button if on first page
+      document.getElementById('prevHistoryPageBtn').disabled = (page <= 1);
+    });
+}
+
+document.getElementById('prevHistoryPageBtn').onclick = () => {
+  if (historyCurrentPage > 1) {
+    historyCurrentPage--;
+    fetchProjectHistory(historyCurrentPage);
+  }
+};
+document.getElementById('nextHistoryPageBtn').onclick = () => {
+  historyCurrentPage++;
+  fetchProjectHistory(historyCurrentPage);
+};
+
+// Fix status button handler
+document.getElementById('fixStatusBtn').onclick = () => {
+  const button = document.getElementById('fixStatusBtn');
+  
+  // Show loading state
+  setButtonLoading(button, true);
+  showLoading('Updating Project Statuses...');
+  
+  authFetch(`${API_BASE}/projects/fix-status`, { method: 'POST' })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'success') {
+      showCustomNotification(`Status fixed! ${data.message}`);
+      // Refresh the project history table
+      fetchProjectHistory(historyCurrentPage);
+    } else {
+      showCustomNotification('Failed to fix status: ' + data.message);
+    }
+  })
+  .catch(error => {
+    console.error('Error fixing status:', error);
+    showCustomNotification('Error fixing status. Check console for details.');
+  })
+  .finally(() => {
+    // Hide loading state
+    setButtonLoading(button, false);
+    hideLoading();
+  });
+};
+
+fetchProjectHistory(historyCurrentPage);
+
+function fetchScheduledProjectsForCalendar() {
+  // Add cache-busting parameter to prevent stale data
+  const cacheBuster = '?_t=' + new Date().getTime();
+  authFetch(`${API_BASE}/scheduled_posts${cacheBuster}`)
+    .then(res => res.json())
+    .then(data => {
+      const calendarEl = $('#calendar');
+      let posts = Array.isArray(data) ? data : data.items;
+      if (!Array.isArray(posts)) posts = [];
+
+      // Get current month and year
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      // Filter posts to only those in the current month
+      posts = posts.filter(post => {
+        const date = new Date(post.scheduled_time || post.time || post.date);
+        return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+      });
+
+      // Map posts to FullCalendar event objects
+      const events = posts.map(post => ({
+        title: post.project_name || post.post_id || 'Scheduled',
+        start: post.scheduled_time,
+        status: post.status,
+        projectName: post.project_name || post.post_id || 'Scheduled',
+        time: post.scheduled_time
+      }));
+
+      calendarEl.fullCalendar('destroy');
+      calendarEl.fullCalendar({
+        header: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'month,agendaWeek,agendaDay'
+        },
+        events: events,
+        eventRender: function(event, element) {
+          element.attr('title', event.projectName + '\n' + moment(event.time).format('LLL'));
+        },
+        dayClick: function(date, jsEvent, view) {
+          // Find all events for this day
+          const dayEvents = events.filter(e => moment(e.start).isSame(date, 'day'));
+          if (dayEvents.length) {
+            let html = '<div style="padding:10px;">';
+            dayEvents.forEach(ev => {
+              html += `<div><b>${ev.projectName}</b><br>${moment(ev.time).format('hh:mm A')} (${ev.status})</div><hr/>`;
+            });
+            html += '</div>';
+            showCalendarPopup(jsEvent.pageX, jsEvent.pageY, html);
+          }
+        },
+        eventClick: function(event, jsEvent, view) {
+          // Show popup for single event
+          let html = `<div style='padding:10px;'><b>${event.projectName}</b><br>${moment(event.time).format('LLL')} (${event.status})</div>`;
+          showCalendarPopup(jsEvent.pageX, jsEvent.pageY, html);
+        }
+      });
+    });
+}
+
+function showCalendarPopup(x, y, html) {
+  let popup = document.getElementById('calendar-popup');
+  if (!popup) {
+    popup = document.createElement('div');
+    popup.id = 'calendar-popup';
+    popup.style.position = 'absolute';
+    popup.style.zIndex = 9999;
+    popup.style.background = '#fff';
+    popup.style.border = '1px solid #ccc';
+    popup.style.borderRadius = '8px';
+    popup.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+    popup.style.padding = '0';
+    document.body.appendChild(popup);
+  }
+  popup.innerHTML = html;
+  popup.style.left = x + 'px';
+  popup.style.top = y + 'px';
+  popup.style.display = 'block';
+  // Hide popup on click outside
+  setTimeout(() => {
+    document.addEventListener('mousedown', hideCalendarPopupOnce, { once: true });
+  }, 0);
+}
+function hideCalendarPopupOnce(e) {
+  let popup = document.getElementById('calendar-popup');
+  if (popup && (!e.target.closest('#calendar-popup'))) {
+    popup.style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetchScheduledProjectsForCalendar();
+});
+});
+</script>
+
+{% endblock javascripts %}

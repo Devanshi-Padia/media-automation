@@ -1,0 +1,72 @@
+      <nav class="sidebar sidebar-offcanvas" id="sidebar">
+        <div class="sidebar-brand-wrapper d-flex align-items-center justify-content-center">
+          <a class="sidebar-brand brand-logo" href="/dashboard">
+            <span class="brand-logo-mini">
+              <i class="mdi mdi-view-dashboard"></i>
+            </span>
+            <span class="brand-logo-normal">
+              Media Creator
+            </span>
+          </a>
+        </div>
+        <ul class="nav">
+          <li class="nav-item profile">
+            <div class="profile-desc">
+              <div class="profile-pic">
+                <img class="img-xs rounded-circle" src="/static/assets/images/faces/user.jpg" alt="Profile image">
+                <div class="profile-name">
+                  <h5 class="mb-0 font-weight-normal">
+                    {{ username }}
+                  </h5>
+                  <span>Media Creator</span>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="nav-item nav-category">
+            <span class="nav-link">Navigation</span>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="/dashboard">
+              <span class="menu-icon">
+                <i class="mdi mdi-speedometer"></i>
+              </span>
+              <span class="menu-title">Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="http://127.0.0.1:8000/api/v1/projects/create">
+              <span class="menu-icon">
+                <i class="mdi mdi-plus"></i>
+              </span>
+              <span class="menu-title">Create Project</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="/user_panel">
+              <span class="menu-icon">
+                <i class="mdi mdi-folder-multiple"></i>
+              </span>
+              <span class="menu-title">My Projects</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="/media_library">
+              <span class="menu-icon">
+                <i class="mdi mdi-image-multiple"></i>
+              </span>
+              <span class="menu-title">Media Library</span>
+            </a>
+          </li>
+          <li class="nav-item menu-items">
+            <a class="nav-link" href="/analytics">
+              <span class="menu-icon">
+                <i class="mdi mdi-chart-line"></i>
+              </span>
+              <span class="menu-title">Analytics</span>
+            </a>
+          </li>
+          
+          
+        </ul>
+      </nav>

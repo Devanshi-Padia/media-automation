@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Review Generated Content</title>
+</head>
+<body>
+    <h2>Review and Edit Generated Content</h2>
+    <form id="editForm">
+        <label for="imagePreview">Image:</label><br>
+        <img id="imagePreview" src="" alt="Generated Image" style="max-width:400px;"><br><br>
+        <label for="textEdit">Text (editable):</label><br>
+        <textarea id="textEdit" rows="15" cols="80"></textarea><br><br>
+        <button type="submit">Save Edits</button>
+    </form>
+    <script>
+        // authFetch wrapper for automatic redirect on token expiration
+        function authFetch(url, options = {}) {
+            return fetch(url, options).then(response => {
+                if (response.status === 401 || response.status === 403) {
+                    window.location.href = '/login';
+                    return Promise.reject(new Error('Session expired. Redirecting to login.'));
+                }
+                return response;
+            });
+        }
+
+        // Fetch generated content
+        authFetch('/v1/content/generate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({prompt: "Your prompt here", output_filename: "generated_image.jpg"})
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('imagePreview').src = data.image_path;
+            document.getElementById('textEdit').value = JSON.stringify(data.text, null, 2);
+        });
+
+        // Save edits
+        document.getElementById('editForm').onsubmit = function(e) {
+            e.preventDefault();
+            authFetch('/v1/content/edit', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    text: JSON.parse(document.getElementById('textEdit').value),
+                    image_path: document.getElementById('imagePreview').src
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Edits saved! ID: ' + data.id);
+            });
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1765 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Analytics Dashboard {% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-12">
+            <!-- Header Card -->
+            <div class="card mb-4 purple-header-card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 d-flex align-items-center">
+                                <i class="mdi mdi-chart-line text-white" style="font-size: 2rem; margin-right: 10px;"></i>
+                            </div>
+                            <div class="d-flex flex-column justify-content-center">
+                                <h4 class="mb-1 text-white">Analytics Dashboard</h4>
+                                <p class="mb-0 text-white-50">Project-specific analytics and insights</p>
+                            </div>
+                        </div>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb mb-0 p-0">
+                                <li class="breadcrumb-item"><a href="/dashboard" class="text-white-50"><i class="mdi mdi-home"></i></a></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" class="text-center py-5" style="display: none;">
+                <div class="spinner mx-auto mb-3"></div>
+                <h5 class="text-purple">Loading Analytics Data...</h5>
+                <p class="text-muted">Please wait while we fetch your analytics data</p>
+            </div>
+
+            <!-- Analytics Summary Cards Layout -->
+            <div id="analyticsSummary" style="display: none;">
+                <!-- Row 1: First 5 cards -->
+                <div class="row mb-3">
+                                         <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-chart-line text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="totalEngagement">0</h6>
+                                         <small class="text-white-50">Total Engagement</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                                                              <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-violet">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-percent text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="avgEngagementRate">0%</h6>
+                                         <small class="text-white-50">Avg Engagement Rate</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-indigo">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-eye text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="totalReach">0</h6>
+                                         <small class="text-white-50">Total Reach</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-2">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-thumb-up text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="quickLikes">0</h6>
+                                         <small class="text-white-50">Total Likes</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-reverse">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-share text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="quickShares">0</h6>
+                                         <small class="text-white-50">Total Shares</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                </div>
+                
+                                 <!-- Row 2: Last 5 cards -->
+                 <div class="row mb-4">
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-3">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-message text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="quickComments">0</h6>
+                                         <small class="text-white-50">Total Comments</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-eye text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="quickImpressions">0</h6>
+                                         <small class="text-white-50">Total Impressions</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-2">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-cursor-pointer text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="quickClicks">0</h6>
+                                         <small class="text-white-50">Total Clicks</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-4">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-calendar text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="quickPostsThisMonth">0</h6>
+                                         <small class="text-white-50">Posts This Month</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="col-xl-2-4 col-lg-2-4 col-md-4 col-sm-6 mb-3">
+                         <div class="card analytics-card h-100 purple-gradient-3">
+                             <div class="card-body">
+                                 <div class="d-flex align-items-center">
+                                     <div class="me-2 d-flex align-items-center">
+                                         <i class="mdi mdi-trophy text-white" style="font-size: 1.2rem; margin-right: 10px;"></i>
+                                     </div>
+                                     <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                         <h6 class="mb-0 text-white" id="bestPlatform">-</h6>
+                                         <small class="text-white-50">Best Platform</small>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- Performance Table Card -->
+            <div class="card mb-4 purple-table-card" id="performanceTable" style="display: none;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-purple">Project Performance</h6>
+                        <div class="d-flex gap-2">
+                            <select id="platformFilter" class="form-select form-select-sm purple-select" style="width: 150px; margin-right: 10px;">
+                                <option value="">All Platforms</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="facebook">Facebook</option>
+                                <option value="twitter">Twitter(X)</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="discord">Discord</option>
+                                <option value="telegram">Telegram</option>
+                            </select>
+                            <div id="filterIndicator" class="badge bg-info me-2" style="display: none;">
+                                <i class="mdi mdi-filter me-1"></i>Filtered
+                            </div>
+                            <button id="syncAnalytics" class="btn btn-outline-purple btn-sm d-flex align-items-center me-2">
+                                <i class="mdi mdi-sync me-2"></i> Sync Analytics
+                            </button>
+                            <button id="exportData" class="btn btn-purple btn-sm d-flex align-items-center me-2" style="margin-right: 10px; margin-left: 10px;">
+                                <i class="mdi mdi-download me-2"></i> Export
+                            </button>
+                            <div class="d-flex align-items-center">
+                                <button id="prevPerformancePageBtn" class="btn btn-sm btn-outline-purple">&lt;</button>
+                                <span id="performancePageIndicator" class="mx-2 text-purple">1</span>
+                                <button id="nextPerformancePageBtn" class="btn btn-sm btn-outline-purple">&gt;</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover purple-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-purple">Project Name</th>
+                                    <th class="text-purple">Platform</th>
+                                    <th class="text-purple">Likes</th>
+                                    <th class="text-purple">Shares</th>
+                                    <th class="text-purple">Comments</th>
+                                    <th class="text-purple">Reach</th>
+                                    <th class="text-purple">Engagement Rate</th>
+                                    <th class="text-purple">Posted Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="performanceTableBody">
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted">No performance data available</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section Card -->
+            <div class="card mb-4 purple-reports-card" id="reportsSection" style="display: none;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-purple">Analytics Reports</h6>
+                                                 <button class="btn btn-purple btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                             <i class="mdi mdi-plus me-2"></i> Generate Report
+                         </button>
+                    </div>
+                    <div id="reportsList">
+                        <div class="text-center text-muted py-4">No reports found</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Report Modal -->
+<div class="modal fade" id="generateReportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content purple-modal">
+            <div class="modal-header purple-modal-header">
+                <h5 class="modal-title text-white">Generate Analytics Report</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <div class="mb-3">
+                        <label for="reportName" class="form-label text-purple">Report Name</label>
+                        <input type="text" class="form-control purple-input" id="reportName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reportType" class="form-label text-purple">Report Type</label>
+                        <select class="form-select purple-select" id="reportType" required>
+                            <option value="performance">Performance Summary</option>
+                            <option value="engagement">Engagement Analysis</option>
+                            <option value="platform">Platform Comparison</option>
+                            <option value="comprehensive">Comprehensive Report</option>
+                        </select>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label text-purple">Start Date</label>
+                                <input type="date" class="form-control purple-input" id="startDate" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label text-purple">End Date</label>
+                                <input type="date" class="form-control purple-input" id="endDate" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="reportFormat" class="form-label text-purple">Format</label>
+                        <select class="form-select purple-select" id="reportFormat" required>
+                            <option value="pdf">PDF</option>
+                            <option value="csv">CSV</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer purple-modal-footer">
+                <button type="button" class="btn btn-outline-purple" data-bs-dismiss="modal">Cancel</button>
+                                 <button type="button" class="btn btn-purple d-flex align-items-center" id="generateReport">Generate Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Purple Admin Theme - Full Page Application */
+:root {
+    --purple-primary: #667eea;
+    --purple-secondary: #764ba2;
+    --purple-accent: #8b5cf6;
+    --purple-light: #a855f7;
+    --purple-dark: #7c3aed;
+    --purple-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --purple-gradient-reverse: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    --purple-gradient-violet: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+    --purple-gradient-indigo: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+}
+
+/* Header Card Theme */
+.purple-header-card {
+    background: var(--purple-gradient);
+    border: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.purple-header-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+/* Table Card Theme */
+.purple-table-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid var(--purple-accent);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+}
+
+.purple-table-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+    border-color: var(--purple-dark);
+}
+
+/* Reports Card Theme */
+.purple-reports-card {
+    background: linear-gradient(135deg, #fafafa 0%, #f3f4f6 100%);
+    border: 2px solid var(--purple-light);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.1);
+}
+
+.purple-reports-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2);
+    border-color: var(--purple-accent);
+}
+
+/* Table Theme */
+.purple-table {
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.purple-table thead th {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 2px solid var(--purple-accent);
+    color: var(--purple-dark);
+    font-weight: 600;
+}
+
+.purple-table tbody tr:hover {
+    background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+    border-left: 3px solid var(--purple-accent);
+}
+
+/* Form Controls Theme */
+.purple-input, .purple-select {
+    border: 2px solid rgba(139, 92, 246, 0.2);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.purple-input:focus, .purple-select:focus {
+    border-color: var(--purple-accent);
+    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+    outline: none;
+}
+
+/* Button Theme */
+.btn-purple {
+    background: var(--purple-gradient);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-purple:hover {
+    background: var(--purple-gradient-reverse);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-purple {
+    background: transparent;
+    border: 2px solid var(--purple-accent);
+    color: var(--purple-accent);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-purple:hover {
+    background: var(--purple-accent);
+    border-color: var(--purple-accent);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+}
+
+/* Modal Theme */
+.purple-modal {
+    border: none;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.purple-modal-header {
+    background: var(--purple-gradient);
+    border-bottom: none;
+}
+
+.purple-modal-footer {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-top: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+/* Badge Theme */
+.badge.bg-primary {
+    background: var(--purple-gradient) !important;
+}
+
+.badge.bg-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+/* Text Colors */
+.text-purple {
+    color: var(--purple-dark) !important;
+}
+
+.text-white-50 {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Analytics Cards Animation */
+.analytics-card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.analytics-card.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Spinner Theme */
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--purple-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Card Hover Effects */
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+
+/* Custom column widths for 5 cards per row */
+@media (min-width: 1200px) {
+    .col-xl-2-4 {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .col-lg-2-4 {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+}
+
+  /* Purple Admin Theme Card Styles */
+  .purple-gradient {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  .purple-gradient:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  }
+
+  .purple-gradient-2 {
+      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+  }
+
+  .purple-gradient-2:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(118, 75, 162, 0.4);
+  }
+
+  .purple-gradient-3 {
+      background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+  }
+
+  .purple-gradient-3:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+  }
+
+  .purple-gradient-4 {
+      background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+      border: none;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .purple-gradient-4:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  }
+
+  .purple-gradient-violet {
+      background: var(--purple-gradient-violet);
+      border: none;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+  }
+
+  .purple-gradient-violet:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+  }
+
+  .purple-gradient-indigo {
+      background: var(--purple-gradient-indigo);
+      border: none;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+  }
+
+  .purple-gradient-indigo:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+  }
+
+  .purple-gradient-reverse {
+      background: var(--purple-gradient-reverse);
+      border: none;
+      box-shadow: 0 4px 15px rgba(118, 75, 162, 0.3);
+  }
+
+  .purple-gradient-reverse:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(118, 75, 162, 0.4);
+  }
+
+.purple-light {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px solid #8b5cf6;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1);
+}
+
+.purple-light:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.2);
+    border-color: #7c3aed;
+}
+
+.purple-light-2 {
+    background: linear-gradient(135deg, #fafafa 0%, #f3f4f6 100%);
+    border: 2px solid #a855f7;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.1);
+}
+
+.purple-light-2:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2);
+    border-color: #9333ea;
+}
+
+.purple-light-3 {
+    background: linear-gradient(135deg, #fefefe 0%, #f9fafb 100%);
+    border: 2px solid #7c3aed;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.1);
+}
+
+.purple-light-3:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.2);
+    border-color: #6d28d9;
+}
+
+.purple-accent {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #8b5cf6;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.15);
+}
+
+.purple-accent:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+    border-color: #7c3aed;
+}
+
+.purple-accent-2 {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    border: 2px solid #a855f7;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.15);
+}
+
+.purple-accent-2:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25);
+    border-color: #9333ea;
+}
+
+.purple-accent-3 {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #7c3aed;
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.15);
+}
+
+.purple-accent-3:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.25);
+    border-color: #6d28d9;
+}
+
+/* Button alignment fixes */
+.btn.d-flex {
+    gap: 0.5rem;
+}
+
+.btn i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ensure consistent button heights */
+.btn-sm {
+    min-height: 32px;
+}
+
+.btn {
+    min-height: 38px;
+}
+</style>
+
+<script>
+// Enhanced Analytics Dashboard JavaScript
+let currentProjectId = null;
+let currentPage = 1;
+let itemsPerPage = 5;
+let currentPerformancePage = 1;
+let performancePerPage = 5;
+let totalPerformancePages = 1;
+
+// Helper function to handle authentication
+function handleAuthError(response) {
+    if (response.status === 401) {
+        window.location.href = '/login';
+        return true;
+    }
+    return false;
+}
+
+// Helper function for authenticated API calls
+function authFetch(url, options = {}) {
+    return fetch(url, {
+        ...options,
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+}
+
+function updateFilterIndicator() {
+    const platformFilter = document.getElementById('platformFilter');
+    const filterIndicator = document.getElementById('filterIndicator');
+    
+    if (platformFilter && filterIndicator) {
+        const selectedPlatform = platformFilter.value;
+        
+        if (selectedPlatform && selectedPlatform !== '') {
+            filterIndicator.style.display = 'inline-block';
+            filterIndicator.innerHTML = `<i class="mdi mdi-filter me-1"></i>${selectedPlatform}`;
+        } else {
+            filterIndicator.style.display = 'none';
+        }
+    }
+}
+
+// Initialize filter indicator on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateFilterIndicator();
+    initializeDashboard();
+});
+
+function initializeDashboard() {
+    console.log('[DEBUG] Initializing analytics dashboard...');
+    
+    // Check if user is authenticated
+    authFetch('/api/v1/user/me')
+    .then(response => {
+        console.log('[DEBUG] Auth check response:', response.status);
+        if (response.ok) {
+            console.log('[DEBUG] User is authenticated, loading analytics...');
+            // Load analytics data for all projects automatically
+            loadAllProjectsAnalytics();
+        } else {
+            console.log('[DEBUG] User not authenticated, redirecting to login...');
+            window.location.href = '/login';
+        }
+    })
+    .catch(error => {
+        console.error('[DEBUG] Auth check error:', error);
+        window.location.href = '/login';
+    });
+    
+    // Sync analytics button (if you want to keep it)
+    const syncButton = document.getElementById('syncAnalytics');
+    if (syncButton) {
+        syncButton.addEventListener('click', function() {
+            syncAllAnalytics();
+        });
+    }
+
+    // Platform filter change
+    const platformFilter = document.getElementById('platformFilter');
+    if (platformFilter) {
+        platformFilter.addEventListener('change', function() {
+            const selectedPlatform = this.value;
+            const filterIndicator = document.getElementById('filterIndicator');
+            
+            // Reset pagination when filter changes
+            currentPerformancePage = 1;
+            
+            // Show/hide filter indicator
+            if (selectedPlatform && selectedPlatform !== '') {
+                filterIndicator.style.display = 'inline-block';
+                filterIndicator.innerHTML = `<i class="mdi mdi-filter me-1"></i>${selectedPlatform}`;
+                showToast(`Filtering by ${selectedPlatform}`, 'info');
+            } else {
+                filterIndicator.style.display = 'none';
+                showToast('Showing all platforms', 'info');
+            }
+            
+            loadAllProjectsAnalytics();
+        });
+    }
+
+    // Export data button
+    const exportButton = document.getElementById('exportData');
+    if (exportButton) {
+        exportButton.addEventListener('click', function() {
+            exportAllAnalyticsData();
+        });
+    }
+
+    // Refresh data button
+    const refreshButton = document.getElementById('refreshData');
+    if (refreshButton) {
+        refreshButton.addEventListener('click', function() {
+            loadAllProjectsAnalytics();
+        });
+    }
+
+    // Report generation
+    const generateReportButton = document.getElementById('generateReport');
+    if (generateReportButton) {
+        generateReportButton.addEventListener('click', function() {
+            generateAllProjectsReport();
+        });
+    }
+
+    // Set default dates for report generation
+    const startDate = document.getElementById('startDate');
+    const endDate = document.getElementById('endDate');
+    if (startDate && endDate) {
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+        
+        startDate.value = thirtyDaysAgo.toISOString().split('T')[0];
+        endDate.value = today.toISOString().split('T')[0];
+    }
+}
+
+function loadAllProjectsAnalytics() {
+    showLoading();
+    
+    // Get the selected platform filter
+    const platformFilter = document.getElementById('platformFilter');
+    const selectedPlatform = platformFilter ? platformFilter.value : '';
+    
+    console.log('[DEBUG] Loading analytics with platform filter:', selectedPlatform);
+    console.log('[DEBUG] Checking authentication status...');
+    
+    // First, fetch user's projects from the API
+    authFetch('/api/v1/analytics/user/projects')
+    .then(response => {
+        console.log('[DEBUG] User projects response status:', response.status);
+        console.log('[DEBUG] User projects response headers:', response.headers);
+        
+        if (!response.ok) {
+            console.log('[DEBUG] User projects request failed:', response.status, response.statusText);
+            if (handleAuthError(response)) {
+                return;
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const projects = data.projects || [];
+        const projectIds = projects.map(project => project.id);
+        
+        if (projectIds.length === 0) {
+            showNoDataMessage();
+            hideLoading();
+            return;
+        }
+        
+        // Aggregate analytics data from all user's projects
+        Promise.all(projectIds.map(projectId => 
+            authFetch(`/api/v1/analytics/projects/${projectId}/summary`)
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.warn(`Project ${projectId} not found or access denied`);
+                        return null;
+                    }
+                    if (handleAuthError(response)) {
+                        return null;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error(`Error loading analytics for project ${projectId}:`, error);
+                return null;
+            })
+        )).then(allData => {
+            console.log('[DEBUG] All analytics data received:', allData);
+            
+            // Filter out null responses and combine all project data
+            const validData = allData.filter(data => data !== null);
+            console.log('[DEBUG] Valid data:', validData);
+            
+            if (validData.length === 0) {
+                showNoDataMessage();
+                hideLoading();
+                return;
+            }
+            
+            // Aggregate the data
+            const aggregated = aggregateAnalyticsData(validData, selectedPlatform);
+            console.log('[DEBUG] Aggregated data:', aggregated);
+            
+            // Update summary cards
+            updateSummaryCards(aggregated);
+            
+            // Get performance data with platform filtering and pagination
+            getPerformanceData(selectedPlatform, currentPerformancePage).then(performanceResult => {
+                console.log('[DEBUG] Performance data with filter:', performanceResult);
+                
+                if (performanceResult && performanceResult.data && performanceResult.data.length > 0) {
+                    updatePerformanceTable(performanceResult.data);
+                    // Update pagination controls
+                    totalPerformancePages = performanceResult.totalPages;
+                    document.getElementById('performancePageIndicator').textContent = currentPerformancePage;
+                    document.getElementById('nextPerformancePageBtn').disabled = (currentPerformancePage >= totalPerformancePages);
+                    document.getElementById('prevPerformancePageBtn').disabled = (currentPerformancePage <= 1);
+                } else {
+                    console.log('[DEBUG] No performance data found, suggesting analytics sync');
+                    showToast('No analytics data found. Click "Sync Analytics" to fetch real data from social media platforms.', 'info');
+                    // Reset pagination controls
+                    totalPerformancePages = 1;
+                    document.getElementById('performancePageIndicator').textContent = '1';
+                    document.getElementById('nextPerformancePageBtn').disabled = true;
+                    document.getElementById('prevPerformancePageBtn').disabled = true;
+                }
+                
+                // Show all sections after data is loaded
+                setTimeout(() => {
+                    showAnalyticsSections();
+                    hideLoading();
+                }, 1000);
+            });
+        });
+    })
+    .catch(error => {
+        console.error('Error loading user projects:', error);
+        
+        // Check if it's an authentication error
+        if (error.message && error.message.includes('401')) {
+            showToast('Please log in to view analytics data.', 'error');
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
+        } else {
+            showToast('Error loading analytics data. Please try again.', 'error');
+        }
+        hideLoading();
+    });
+}
+
+function getPerformanceData(platformFilter = '', page = 1) {
+    console.log('[DEBUG] Getting performance data with platform filter:', platformFilter, 'page:', page);
+    
+    // First, fetch user's projects
+    return authFetch('/api/v1/analytics/user/projects')
+    .then(response => {
+        if (!response.ok) {
+            if (handleAuthError(response)) {
+                return { data: [], total: 0, totalPages: 1 };
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const projects = data.projects || [];
+        const projectIds = projects.map(project => project.id);
+        
+        if (projectIds.length === 0) {
+            return { data: [], total: 0, totalPages: 1 };
+        }
+        
+        // Get performance data for all projects
+        return Promise.all(projectIds.map(projectId => 
+            authFetch(`/api/v1/analytics/projects/${projectId}/performance?page=${page}&per_page=${performancePerPage}`)
+            .then(response => {
+                console.log(`[DEBUG] Performance response for project ${projectId}:`, response.status);
+                
+                if (!response.ok) {
+                    console.log(`[DEBUG] Performance request failed for project ${projectId}:`, response.status, response.statusText);
+                    if (response.status === 404) {
+                        console.warn(`Project ${projectId} not found or access denied`);
+                        return [];
+                    }
+                    if (handleAuthError(response)) {
+                        return [];
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error(`Error loading performance for project ${projectId}:`, error);
+                return [];
+            })
+        ));
+    })
+    .then(allPerformanceData => {
+        console.log('[DEBUG] All performance data received:', allPerformanceData);
+        
+        // Combine all performance data and filter out failed projects
+        let combinedPerformance = [];
+        let totalItems = 0;
+        
+        allPerformanceData.forEach(projectData => {
+            console.log('[DEBUG] Processing project data:', projectData);
+            if (projectData && Array.isArray(projectData)) {
+                // Filter out failed projects (only show successful ones)
+                const successfulData = projectData.filter(item => {
+                    const isSuccessful = item.project_status && 
+                        (item.project_status.toLowerCase() === 'completed' || 
+                         item.project_status.toLowerCase() === 'posted' ||
+                         item.project_status.toLowerCase() === 'success');
+                    
+                    if (!isSuccessful) {
+                        console.log('[DEBUG] Filtering out failed project:', item.title, 'Status:', item.project_status);
+                    }
+                    
+                    return isSuccessful;
+                });
+                combinedPerformance = combinedPerformance.concat(successfulData);
+                totalItems += successfulData.length;
+            } else if (projectData && projectData.analytics) {
+                // Fallback for old format
+                combinedPerformance = combinedPerformance.concat(projectData.analytics);
+                totalItems += projectData.analytics.length;
+            }
+        });
+        
+        console.log('[DEBUG] Combined performance data:', combinedPerformance);
+        
+        // Apply platform filter if specified
+        if (platformFilter && platformFilter !== '') {
+            console.log('[DEBUG] Before filtering:', combinedPerformance.length, 'items');
+            console.log('[DEBUG] Platform filter value:', platformFilter);
+            combinedPerformance = combinedPerformance.filter(item => {
+                const matches = item.platform && item.platform.toLowerCase() === platformFilter.toLowerCase();
+                if (!matches) {
+                    console.log('[DEBUG] Filtered out item:', item.platform, 'does not match', platformFilter);
+                }
+                return matches;
+            });
+            console.log('[DEBUG] After filtering:', combinedPerformance.length, 'items for platform', platformFilter);
+        } else {
+            console.log('[DEBUG] No platform filter applied, showing all data');
+        }
+        
+        // Calculate pagination
+        const totalPages = Math.ceil(combinedPerformance.length / performancePerPage);
+        const startIndex = (page - 1) * performancePerPage;
+        const endIndex = startIndex + performancePerPage;
+        const paginatedData = combinedPerformance.slice(startIndex, endIndex);
+        
+        console.log('[DEBUG] Pagination info:', {
+            total: combinedPerformance.length,
+            page: page,
+            perPage: performancePerPage,
+            totalPages: totalPages,
+            startIndex: startIndex,
+            endIndex: endIndex,
+            paginatedDataLength: paginatedData.length
+        });
+        
+        return {
+            data: paginatedData,
+            total: combinedPerformance.length,
+            totalPages: totalPages
+        };
+    })
+    .catch(error => {
+        console.error('Error getting performance data:', error);
+        return { data: [], total: 0, totalPages: 1 };
+    });
+}
+
+function aggregateAnalyticsData(allData, platformFilter = '') {
+    const aggregated = {
+        total_posts: 0,
+        total_engagement: 0,
+        total_likes: 0,
+        total_shares: 0,
+        total_comments: 0,
+        total_reach: 0,
+        total_impressions: 0,
+        total_clicks: 0,
+        platform_breakdown: {}
+    };
+    
+    console.log('[DEBUG] Aggregating analytics data:', allData);
+    console.log('[DEBUG] Platform filter:', platformFilter);
+    
+    allData.forEach((data, index) => {
+        console.log(`[DEBUG] Processing data ${index}:`, JSON.stringify(data, null, 2));
+        console.log(`[DEBUG] Data keys:`, Object.keys(data));
+        console.log(`[DEBUG] total_posts:`, data.total_posts);
+        console.log(`[DEBUG] total_engagement:`, data.total_engagement);
+        console.log(`[DEBUG] total_reach:`, data.total_reach);
+        console.log(`[DEBUG] total_impressions:`, data.total_impressions);
+        console.log(`[DEBUG] total_clicks:`, data.total_clicks);
+        console.log(`[DEBUG] average_engagement_rate:`, data.average_engagement_rate);
+        console.log(`[DEBUG] average_click_rate:`, data.average_click_rate);
+        console.log(`[DEBUG] platform_breakdown:`, data.platform_breakdown);
+        
+        // Apply platform filter to summary data if specified
+        if (platformFilter && platformFilter !== '') {
+            if (data.platform_breakdown && data.platform_breakdown[platformFilter]) {
+                const platformData = data.platform_breakdown[platformFilter];
+                aggregated.total_posts += platformData.posts || 0;
+                aggregated.total_engagement += platformData.engagement || 0;
+                aggregated.total_likes += platformData.likes || 0;
+                aggregated.total_shares += platformData.shares || 0;
+                aggregated.total_comments += platformData.comments || 0;
+                aggregated.total_reach += platformData.reach || 0;
+                aggregated.total_impressions += platformData.impressions || 0;
+                aggregated.total_clicks += platformData.clicks || 0;
+                
+                // Only include the filtered platform in breakdown
+                if (!aggregated.platform_breakdown[platformFilter]) {
+                    aggregated.platform_breakdown[platformFilter] = { 
+                        posts: 0, 
+                        engagement: 0,
+                        likes: 0,
+                        shares: 0,
+                        comments: 0,
+                        reach: 0,
+                        impressions: 0,
+                        clicks: 0
+                    };
+                }
+                aggregated.platform_breakdown[platformFilter].posts += platformData.posts || 0;
+                aggregated.platform_breakdown[platformFilter].engagement += platformData.engagement || 0;
+                aggregated.platform_breakdown[platformFilter].likes += platformData.likes || 0;
+                aggregated.platform_breakdown[platformFilter].shares += platformData.shares || 0;
+                aggregated.platform_breakdown[platformFilter].comments += platformData.comments || 0;
+                aggregated.platform_breakdown[platformFilter].reach += platformData.reach || 0;
+                aggregated.platform_breakdown[platformFilter].impressions += platformData.impressions || 0;
+                aggregated.platform_breakdown[platformFilter].clicks += platformData.clicks || 0;
+            }
+        } else {
+            // No filter - aggregate all data
+            aggregated.total_posts += data.total_posts || 0;
+            aggregated.total_engagement += data.total_engagement || 0;
+            aggregated.total_likes += data.total_likes || 0;
+            aggregated.total_shares += data.total_shares || 0;
+            aggregated.total_comments += data.total_comments || 0;
+            aggregated.total_reach += data.total_reach || 0;
+            aggregated.total_impressions += data.total_impressions || 0;
+            aggregated.total_clicks += data.total_clicks || 0;
+            
+            // Aggregate platform breakdown
+            if (data.platform_breakdown) {
+                console.log(`[DEBUG] Processing platform breakdown for data ${index}:`, data.platform_breakdown);
+                Object.keys(data.platform_breakdown).forEach(platform => {
+                    if (!aggregated.platform_breakdown[platform]) {
+                        aggregated.platform_breakdown[platform] = { 
+                            posts: 0, 
+                            engagement: 0,
+                            likes: 0,
+                            shares: 0,
+                            comments: 0,
+                            reach: 0,
+                            impressions: 0,
+                            clicks: 0
+                        };
+                    }
+                    const platformData = data.platform_breakdown[platform];
+                    console.log(`[DEBUG] Platform ${platform} data:`, platformData);
+                    aggregated.platform_breakdown[platform].posts += platformData.posts || 0;
+                    aggregated.platform_breakdown[platform].engagement += platformData.engagement || 0;
+                    aggregated.platform_breakdown[platform].likes += platformData.likes || 0;
+                    aggregated.platform_breakdown[platform].shares += platformData.shares || 0;
+                    aggregated.platform_breakdown[platform].comments += platformData.comments || 0;
+                    aggregated.platform_breakdown[platform].reach += platformData.reach || 0;
+                    aggregated.platform_breakdown[platform].impressions += platformData.impressions || 0;
+                    aggregated.platform_breakdown[platform].clicks += platformData.clicks || 0;
+                });
+            }
+        }
+    });
+    
+    // Calculate averages with proper error handling
+    const projectCount = allData.length;
+    
+    // Calculate average engagement rate from individual project rates
+    if (projectCount > 0) {
+        const totalEngagementRate = allData.reduce((sum, data) => sum + (data.average_engagement_rate || 0), 0);
+        aggregated.average_engagement_rate = (totalEngagementRate / projectCount).toFixed(1);
+    } else {
+        aggregated.average_engagement_rate = 0;
+    }
+    
+    // Calculate average click rate from real data
+    if (aggregated.total_impressions > 0) {
+        aggregated.average_click_rate = (aggregated.total_clicks / aggregated.total_impressions * 100).toFixed(1);
+    } else {
+        aggregated.average_click_rate = 0;
+    }
+    
+    // Determine best platform (platform with most posts/analytics)
+    let bestPlatform = '-';
+    let maxPosts = 0;
+    
+    Object.keys(aggregated.platform_breakdown).forEach(platform => {
+        const platformData = aggregated.platform_breakdown[platform];
+        if (platformData.posts > maxPosts) {
+            maxPosts = platformData.posts;
+            bestPlatform = platform;
+        }
+    });
+    
+    aggregated.best_platform = bestPlatform;
+    
+    console.log('[DEBUG] Final aggregated data:', aggregated);
+    return aggregated;
+}
+
+function loadAllProjectsPerformanceData(projectIds) {
+    console.log('[DEBUG] Loading performance data for projects:', projectIds);
+    
+    // Load performance data for all projects using the new performance endpoint
+    Promise.all(projectIds.map(projectId =>
+        authFetch(`/api/v1/analytics/projects/${projectId}/performance`)
+        .then(response => {
+            console.log(`[DEBUG] Response for project ${projectId}:`, response.status);
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.warn(`Project ${projectId} not found or access denied`);
+                    return [];
+                }
+                if (handleAuthError(response)) {
+                    return [];
+                }
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+                    .then(data => {
+                console.log(`[DEBUG] Performance data for project ${projectId}:`, data);
+                console.log(`[DEBUG] Data type:`, typeof data);
+                console.log(`[DEBUG] Is array:`, Array.isArray(data));
+                if (Array.isArray(data) && data.length > 0) {
+                    console.log(`[DEBUG] First item structure:`, data[0]);
+                    console.log(`[DEBUG] First item keys:`, Object.keys(data[0]));
+                }
+                return data;
+            })
+        .catch(error => {
+            console.error(`Error loading performance data for project ${projectId}:`, error);
+            return [];
+        })
+    )).then(allPerformanceData => {
+        console.log('[DEBUG] All performance data received:', allPerformanceData);
+        // Combine all performance data
+        const combinedPerformance = allPerformanceData.flat();
+        console.log('[DEBUG] Combined performance data:', combinedPerformance);
+        
+        // If no performance data found, suggest syncing analytics
+        if (combinedPerformance.length === 0 || combinedPerformance.every(item => 
+            item.likes === 0 && item.shares === 0 && item.comments === 0 && item.reach === 0)) {
+            console.log('[DEBUG] No performance data found, suggesting analytics sync');
+            showToast('No analytics data found. Click "Sync Analytics" to fetch real data from social media platforms.', 'info');
+            
+            // Show a more prominent message in the performance table
+            const tbody = document.getElementById('performanceTableBody');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4">
+                            <div class="alert alert-info">
+                                <i class="mdi mdi-information-outline me-2"></i>
+                                <strong>No Analytics Data Available</strong><br>
+                                <small class="text-muted">Click "Sync Analytics" to fetch real data from social media platforms.</small>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        updatePerformanceTable(combinedPerformance);
+    });
+}
+
+function syncAllAnalytics() {
+    // First, fetch user's projects
+    authFetch('/api/v1/analytics/user/projects')
+    .then(response => {
+        if (!response.ok) {
+            if (handleAuthError(response)) {
+                return;
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const projects = data.projects || [];
+        const projectIds = projects.map(project => project.id);
+        
+        if (projectIds.length === 0) {
+            showToast('No projects to sync', 'error');
+            return;
+        }
+        
+        showToast('Syncing analytics for all projects...', 'info');
+        
+        // Sync all projects using the new analytics sync endpoint
+        Promise.all(projectIds.map(projectId =>
+            authFetch(`/api/v1/analytics/analytics/sync/${projectId}`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        console.warn(`Project ${projectId} not found or access denied`);
+                        return { error: true };
+                    }
+                    if (handleAuthError(response)) {
+                        return { error: true };
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error(`Error syncing project ${projectId}:`, error);
+                return { error: true };
+            })
+        )).then(results => {
+            const successCount = results.filter(r => !r.error).length;
+            showToast(`Successfully synced ${successCount} out of ${projectIds.length} projects`, 'success');
+            // Reload analytics data after sync
+            loadAllProjectsAnalytics();
+        });
+    })
+    .catch(error => {
+        console.error('Error loading user projects for sync:', error);
+        showToast('Error syncing analytics. Please try again.', 'error');
+    });
+}
+
+function updateSummaryCards(data) {
+    console.log('[DEBUG] Updating summary cards with data:', data);
+    
+    const elements = {
+        'totalEngagement': document.getElementById('totalEngagement'),
+        'avgEngagementRate': document.getElementById('avgEngagementRate'),
+        'totalReach': document.getElementById('totalReach'),
+        'bestPlatform': document.getElementById('bestPlatform'),
+        'platformPerformance': document.getElementById('platformPerformance')
+    };
+    
+    // Update main metrics with real data
+    if (elements.totalEngagement) elements.totalEngagement.textContent = (data.total_engagement || 0).toLocaleString();
+    
+    // Handle engagement rate properly
+    const engagementRate = data.average_engagement_rate || 0;
+    if (elements.avgEngagementRate) {
+        if (engagementRate > 1000) {
+            // If engagement rate is unreasonably high, cap it
+            elements.avgEngagementRate.textContent = '100%';
+        } else {
+            elements.avgEngagementRate.textContent = engagementRate + '%';
+        }
+    }
+    
+    if (elements.totalReach) elements.totalReach.textContent = (data.total_reach || 0).toLocaleString();
+    
+    // Update additional metrics
+    if (elements.bestPlatform) elements.bestPlatform.textContent = data.best_platform || '-';
+    
+    // Update platform performance text
+    if (elements.platformPerformance) elements.platformPerformance.textContent = 'Most active platform';
+    
+    console.log('[DEBUG] Summary cards updated successfully');
+}
+
+function updateQuickStats(data) {
+    console.log('[DEBUG] updateQuickStats called with data:', data);
+    
+    // Use real data from backend instead of estimated percentages
+    const totalLikes = data.total_likes || 0;
+    const totalShares = data.total_shares || 0;
+    const totalComments = data.total_comments || 0;
+    const totalImpressions = data.total_impressions || 0;
+    const totalClicks = data.total_clicks || 0;
+    const postsThisMonth = data.total_posts || 0;
+    
+    console.log('[DEBUG] Quick stats calculated:', {
+        totalLikes, totalShares, totalComments, totalImpressions, 
+        totalClicks, postsThisMonth
+    });
+    
+    const elements = {
+        'quickLikes': document.getElementById('quickLikes'),
+        'quickShares': document.getElementById('quickShares'),
+        'quickComments': document.getElementById('quickComments'),
+        'quickImpressions': document.getElementById('quickImpressions'),
+        'quickClicks': document.getElementById('quickClicks'),
+        'quickPostsThisMonth': document.getElementById('quickPostsThisMonth')
+    };
+    
+    if (elements.quickLikes) elements.quickLikes.textContent = totalLikes.toLocaleString();
+    if (elements.quickShares) elements.quickShares.textContent = totalShares.toLocaleString();
+    if (elements.quickComments) elements.quickComments.textContent = totalComments.toLocaleString();
+    if (elements.quickImpressions) elements.quickImpressions.textContent = totalImpressions.toLocaleString();
+    if (elements.quickClicks) elements.quickClicks.textContent = totalClicks.toLocaleString();
+    if (elements.quickPostsThisMonth) elements.quickPostsThisMonth.textContent = postsThisMonth;
+}
+
+function loadPerformanceData(projectId, platform = '') {
+    const url = platform ? 
+        `/api/v1/analytics/projects/${projectId}/posts?platform=${platform}` :
+        `/api/v1/analytics/projects/${projectId}/posts`;
+    
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            updatePerformanceTable(data);
+        })
+        .catch(error => {
+            console.error('Error loading performance data:', error);
+            updatePerformanceTable([]);
+        });
+}
+
+function updatePerformanceTable(data) {
+    console.log('[DEBUG] updatePerformanceTable called with data:', data);
+    const tbody = document.getElementById('performanceTableBody');
+    if (!tbody) {
+        console.error('[DEBUG] performanceTableBody not found');
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    
+    if (data && data.length > 0) {
+        console.log('[DEBUG] Processing', data.length, 'performance records');
+        data.forEach((project, index) => {
+            console.log(`[DEBUG] Processing project ${index}:`, project);
+            const row = tbody.insertRow();
+            
+            // Format the dates properly
+            
+            let postedDate = 'N/A';
+            
+            if (project.posted_at) {
+                try {
+                    const date = new Date(project.posted_at);
+                    if (!isNaN(date.getTime())) {
+                        postedDate = date.toLocaleDateString();
+                    } else {
+                        console.warn('[DEBUG] Invalid posted_at date:', project.posted_at);
+                        postedDate = 'N/A';
+                    }
+                } catch (e) {
+                    console.warn('[DEBUG] Error parsing posted_at:', project.posted_at, e);
+                    postedDate = 'N/A';
+                }
+            }
+            
+            row.innerHTML = `
+                <td>
+                    <strong>${project.title || `Project ${project.post_id}`}</strong>
+                </td>
+                <td><span class="badge bg-primary">${project.platform}</span></td>
+                <td>${(project.likes || 0).toLocaleString()}</td>
+                <td>${(project.shares || 0).toLocaleString()}</td>
+                <td>${(project.comments || 0).toLocaleString()}</td>
+                <td>${(project.reach || 0).toLocaleString()}</td>
+                <td><span class="badge bg-success">${(project.engagement_rate || 0).toFixed(1)}%</span></td>
+                <td>
+                    <small class="text-muted">${postedDate}</small>
+                </td>
+            `;
+        });
+    } else {
+        console.log('[DEBUG] No performance data available');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-4">
+                    <div class="alert alert-info">
+                        <i class="mdi mdi-information-outline me-2"></i>
+                        <strong>No Posted Projects Found</strong><br>
+                        <small class="text-muted">Only successfully posted projects with analytics data are shown here.</small>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+function loadReports() {
+    fetch('/api/v1/analytics/reports')
+        .then(response => response.json())
+        .then(data => {
+            updateReportsList(data);
+        })
+        .catch(error => {
+            console.error('Error loading reports:', error);
+            updateReportsList([]);
+        });
+}
+
+function updateReportsList(data) {
+    const container = document.getElementById('reportsList');
+    if (!container) return;
+    
+    if (data && data.length > 0) {
+        container.innerHTML = data.map(report => `
+            <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">${report.report_name}</h6>
+                            <p class="text-muted mb-0">${report.report_type} • ${new Date(report.created_at).toLocaleDateString()}</p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-${report.status === 'completed' ? 'success' : 'warning'}">${report.status}</span>
+                            ${report.status === 'completed' ? 
+                                `                                 <button class="btn btn-sm btn-outline-primary d-flex align-items-center" onclick="downloadReport('${report.report_id}')" title="Download">
+                                     <i class="mdi mdi-download"></i>
+                                 </button>` : ''
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        container.innerHTML = '<div class="text-center text-muted py-4">No reports found</div>';
+    }
+}
+
+function syncAnalytics(projectId) {
+    const button = document.getElementById('syncAnalytics');
+    const originalText = button.innerHTML;
+    
+    button.disabled = true;
+         button.innerHTML = '<i class="mdi mdi-sync mdi-spin me-2"></i> Syncing...';
+    
+    // Call the sync API
+    fetch(`/api/v1/analytics/projects/${projectId}/sync`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'discord', 'telegram']
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast('Analytics synced successfully!', 'success');
+        loadAllProjectsAnalytics();
+    })
+    .catch(error => {
+        console.error('Error syncing analytics:', error);
+        showToast('Error syncing analytics. Please try again.', 'error');
+    })
+    .finally(() => {
+        button.disabled = false;
+        button.innerHTML = originalText;
+    });
+}
+
+function generateAllProjectsReport() {
+    const formData = {
+        report_name: document.getElementById('reportName').value,
+        report_type: document.getElementById('reportType').value,
+        date_range: {
+            start: document.getElementById('startDate').value,
+            end: document.getElementById('endDate').value
+        },
+        format: document.getElementById('reportFormat').value,
+        all_projects: true
+    };
+    
+    // Call the report generation API for all projects
+    fetch('/api/v1/analytics/reports/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast('Report generation started for all projects!', 'success');
+        $('#generateReportModal').modal('hide');
+        
+        setTimeout(() => {
+            showToast('Report generated successfully!', 'success');
+            loadReports();
+        }, 3000);
+    })
+    .catch(error => {
+        console.error('Error generating report:', error);
+        showToast('Error generating report. Please try again.', 'error');
+    });
+}
+
+function exportAllAnalyticsData() {
+    const platform = document.getElementById('platformFilter').value;
+    
+    // Simulate export for all projects
+    showToast('Export started! Download will begin shortly.', 'success');
+    setTimeout(() => {
+        // Create a dummy download link with aggregated data
+        const link = document.createElement('a');
+        link.href = 'data:text/csv;charset=utf-8,Platform,Posts,Engagement,Reach\n' + 
+                   'Instagram,145,88560,442800\n' +
+                   'Facebook,138,74960,374800\n' +
+                   'Twitter(X),132,56060,280300\n' +
+                   'LinkedIn,125,40710,203550\n' +
+                   'Discord,112,23210,116050\n' +
+                   'Telegram,105,10200,51000';
+        link.download = `analytics_export_all_projects_${platform || 'all'}_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+    }, 1000);
+}
+
+function downloadReport(reportId) {
+    // Simulate report download
+    showToast('Download started!', 'success');
+    setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,JVBERi0xLjQKJcOkw7zDtsO8DQoxIDAgb2JqDQo8PA0KL1R5cGUgL0NhdGFsb2cNCi9QYWdlcyAyIDAgUg0KPj4NCmVuZG9iag0KMiAwIG9iag0KPDwNCi9UeXBlIC9QYWdlcw0KL0NvdW50IDENCi9LaWRzIFsgMyAwIFIgXQ0KPj4NCmVuZG9iag0KMyAwIG9iag0KPDwNCi9UeXBlIC9QYWdlDQovUGFyZW50IDIgMCBSDQovUmVzb3VyY2VzIDw8DQovRm9udCA8PA0KL0YxIDQgMCBSDQo+Pg0KPj4NCi9Db250ZW50cyA1IDAgUg0KL01lZGlhQm94IFsgMCAwIDU5NSA4NDIgXQ0KPj4NCmVuZG9iag0KNCAwIG9iag0KPDwNCi9UeXBlIC9Gb250DQovU3VidHlwZSAvVHlwZTENCi9CYXNlRm9udCAvSGVsdmV0aWNhDQovRW5jb2RpbmcgL1dpbkFuc2lFbmNvZGluZw0KPj4NCmVuZG9iag0KNSAwIG9iag0KPDwNCi9MZW5ndGggNDQNCj4+DQpzdHJlYW0NCkJUCjcwIDUwIFRECi9GMSAxMiBUZgooSGVsbG8gV29ybGQpIFRqCkVUCmVuZHN0cmVhbQ0KZW5kb2JqDQp4cmVmDQowIDYNCjAwMDAwMDAwMDAgNjU1MzUgZiANCjAwMDAwMDAwMTAgMDAwMDAgbg0KMDAwMDAwMDA3OSAwMDAwMCBuDQowMDAwMDAwMTczIDAwMDAwIG4NCjAwMDAwMDAzMDEgMDAwMDAgbg0KMDAwMDAwMDM4MCAwMDAwMCBuDQp0cmFpbGVyDQo8PA0KL1NpemUgNg0KL1Jvb3QgMSAwIFINCj4+DQpzdGFydHhyZWYNCjQ5Mg0KJSVFT0Y=';
+        link.download = `report_${reportId}_${new Date().toISOString().split('T')[0]}.pdf`;
+        link.click();
+    }, 1000);
+}
+
+function viewPostDetails(postId) {
+    // Implement post details view
+    console.log('Viewing post details for:', postId);
+}
+
+
+
+// Utility functions
+function showLoading() {
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    if (loadingSpinner) {
+        loadingSpinner.style.display = 'block';
+    }
+    hideAllSections();
+}
+
+function hideLoading() {
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    if (loadingSpinner) {
+        loadingSpinner.style.display = 'none';
+    }
+}
+
+function showAnalyticsSections() {
+    // Show all sections with a slight delay for smooth animation
+    const sections = [
+        'analyticsSummary', 
+        'performanceTable',
+        'reportsSection'
+    ];
+    
+    sections.forEach((sectionId, index) => {
+        setTimeout(() => {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.style.display = 'block';
+                
+                // Add show class to analytics cards
+                const cards = element.querySelectorAll('.analytics-card');
+                cards.forEach((card, cardIndex) => {
+                    setTimeout(() => {
+                        card.classList.add('show');
+                    }, cardIndex * 100);
+                });
+            }
+        }, index * 200);
+    });
+}
+
+function hideAllSections() {
+    const sections = [
+        'analyticsSummary',
+        'performanceTable',
+        'reportsSection',
+        'noDataMessage'
+    ];
+    
+    sections.forEach(sectionId => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            element.style.display = 'none';
+        }
+    });
+}
+
+function showNoDataMessage() {
+    // Hide all sections
+    hideAllSections();
+    
+    // Show no data message
+    const analyticsSummary = document.getElementById('analyticsSummary');
+    if (analyticsSummary) {
+        analyticsSummary.style.display = 'block';
+        analyticsSummary.innerHTML = `
+            <div class="text-center py-5">
+                <i class="mdi mdi-chart-line" style="font-size: 4rem; color: #6c757d;"></i>
+                <h4 class="mt-3 text-muted">No Analytics Data Available</h4>
+                <p class="text-muted">You don't have any projects with analytics data yet.</p>
+                <div class="mt-4">
+                    <a href="/api/v1/projects/create" class="btn btn-primary me-2">
+                        <i class="mdi mdi-plus me-2"></i>Create Your First Project
+                    </a>
+                    
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Using the custom notification system from base layout
+function showToast(message, type = 'info') {
+    // Map toast types to custom notification types
+    let notificationType = 'success';
+    if (type === 'error') notificationType = 'error';
+    else if (type === 'info') notificationType = 'partial'; // Using partial for info messages
+    
+    showCustomNotification(message, notificationType);
+}
+
+// Performance pagination event handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Performance pagination controls
+    const prevPerformancePageBtn = document.getElementById('prevPerformancePageBtn');
+    const nextPerformancePageBtn = document.getElementById('nextPerformancePageBtn');
+    
+    if (prevPerformancePageBtn) {
+        prevPerformancePageBtn.addEventListener('click', function() {
+            if (currentPerformancePage > 1) {
+                currentPerformancePage--;
+                loadAllProjectsAnalytics();
+            }
+        });
+    }
+    
+    if (nextPerformancePageBtn) {
+        nextPerformancePageBtn.addEventListener('click', function() {
+            if (currentPerformancePage < totalPerformancePages) {
+                currentPerformancePage++;
+                loadAllProjectsAnalytics();
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

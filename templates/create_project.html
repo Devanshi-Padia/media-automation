@@ -1,0 +1,493 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Create New Project{% endblock %}
+
+{% block content %}
+<div class="content-wrapper">
+  <div class="row justify-content-center">
+  <div class="col-md-8">
+      <div class="card form-card">
+      <div class="card-body">
+          <h4 class="card-title">Create New Project</h4>
+          <form method="post" action="http://127.0.0.1:8000/api/v1/projects/create">
+          <div class="form-group">
+            <label for="name">Project Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="topic">Topic</label>
+            <input type="text" class="form-control" id="topic" name="topic" required>
+          </div>
+          <div class="form-group">
+            <label>Image</label><br>
+              <div class="image-radio-group d-flex align-items-center">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="with_image" id="with_image_yes" value="yes" checked>
+                <label class="form-check-label" for="with_image_yes">Yes</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="with_image" id="with_image_no" value="no">
+                <label class="form-check-label" for="with_image_no">No</label>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="content_type">Type of Content</label>
+            <input type="text" class="form-control" id="content_type" name="content_type" placeholder="News, Info, Facts" required>
+          </div>
+          <div class="mb-3">
+              <a href="/public/credentials.html" target="_blank" class="credentials-link">
+                <i class="mdi mdi-information-outline"></i> Credentials Guide
+              </a>
+          </div>
+          <div class="form-group">
+            <label>Social Medias</label><br>
+              <div class="social-checkboxes d-flex flex-wrap">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input social-media-checkbox" type="checkbox" id="instagram" name="social_medias" value="instagram">
+                <label class="form-check-label" for="instagram">Instagram</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input social-media-checkbox" type="checkbox" id="facebook" name="social_medias" value="facebook">
+                <label class="form-check-label" for="facebook">Facebook</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input social-media-checkbox" type="checkbox" id="X" name="social_medias" value="X">
+                <label class="form-check-label" for="X">X (Twitter)</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input social-media-checkbox" type="checkbox" id="linkedin" name="social_medias" value="linkedin">
+                <label class="form-check-label" for="linkedin">LinkedIn</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input social-media-checkbox" type="checkbox" id="discord" name="social_medias" value="discord">
+                <label class="form-check-label" for="discord">Discord</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input social-media-checkbox" type="checkbox" id="telegram" name="social_medias" value="telegram">
+                <label class="form-check-label" for="telegram">Telegram</label>
+              </div>
+            </div>
+          </div>
+          <div id="credentials-section">
+            <!-- Credentials fields will be shown here dynamically -->
+            <div class="social-credentials instagram-credentials d-none">
+                <h5><i class="mdi mdi-instagram"></i> Instagram Credentials</h5>
+                <!-- Hidden fields to trick autofill -->
+                <input type="text" style="display:none;" autocomplete="username">
+                <input type="password" style="display:none;" autocomplete="current-password">
+                <div class="form-group">
+                  <label>IG Username</label>
+                  <input type="text" class="form-control" name="ig_username" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>IG Password</label>
+                  <input type="text" class="form-control password-field" name="ig_password" autocomplete="new-password"  style="font-family: monospace;" required>
+                </div>
+            </div>
+            <div class="social-credentials facebook-credentials d-none">
+                <h5><i class="mdi mdi-facebook"></i> Facebook Credentials</h5>
+                <!-- Hidden fields to trick autofill -->
+                <input type="text" style="display:none;" autocomplete="username">
+                <input type="password" style="display:none;" autocomplete="current-password">
+                <div class="form-group">
+                  <label>FB Page ID</label>
+                  <input type="text" class="form-control" name="fb_page_id" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>FB Page Access Token</label>
+                  <input type="text" class="form-control" name="fb_page_access_token" autocomplete="new-password"  required>
+                </div>
+            </div>
+            <div class="social-credentials X-credentials d-none">
+                <h5><i class="mdi mdi-twitter"></i> X (Twitter) Credentials</h5>
+                <!-- Hidden fields to trick autofill -->
+                <input type="text" style="display:none;" autocomplete="username">
+                <input type="password" style="display:none;" autocomplete="current-password">
+                <div class="form-group">
+                  <label>Twitter API Key</label>
+                  <input type="text" class="form-control" name="twitter_api_key" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>Twitter API Secret</label>
+                  <input type="text" class="form-control" name="twitter_api_secret" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>Twitter Access Token</label>
+                  <input type="text" class="form-control" name="twitter_access_token" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>Twitter Access Secret</label>
+                  <input type="text" class="form-control" name="twitter_access_secret" autocomplete="new-password"  required>
+                </div>
+            </div>
+            <div class="social-credentials linkedin-credentials d-none">
+                <h5><i class="mdi mdi-linkedin"></i> LinkedIn Credentials</h5>
+                <!-- Hidden fields to trick autofill -->
+                <input type="text" style="display:none;" autocomplete="username">
+                <input type="password" style="display:none;" autocomplete="current-password">
+                <div class="form-group">
+                  <label>LinkedIn Access Token</label>
+                  <input type="text" class="form-control" name="linkedin_access_token" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>LinkedIn Author URN</label>
+                  <input type="text" class="form-control" name="linkedin_author_urn" placeholder="urn:li:person:xxxx or urn:li:organization:xxxx" autocomplete="new-password"  required>
+                </div>
+            </div>
+            <div class="social-credentials discord-credentials d-none">
+                <h5><i class="mdi mdi-discord"></i> Discord Credentials</h5>
+                <!-- Hidden fields to trick autofill -->
+                <input type="text" style="display:none;" autocomplete="username">
+                <input type="password" style="display:none;" autocomplete="current-password">
+                <div class="form-group">
+                  <label>Discord Webhook URL</label>
+                  <input type="text" class="form-control" name="discord_webhook_url" autocomplete="new-password"  required>
+                </div>
+              </div>
+            </div>
+            <div class="social-credentials telegram-credentials d-none">
+                <h5><i class="mdi mdi-telegram"></i> Telegram Credentials</h5>
+                <!-- Hidden fields to trick autofill -->
+                <input type="text" style="display:none;" autocomplete="username">
+                <input type="password" style="display:none;" autocomplete="current-password">
+                <div class="form-group">
+                  <label>Telegram Bot Token</label>
+                  <input type="text" class="form-control" name="telegram_bot_token" autocomplete="new-password"  required>
+                </div>
+                <div class="form-group">
+                  <label>Telegram Chat ID</label>
+                  <input type="text" class="form-control" name="telegram_chat_id" placeholder="@channel_name or -100xxxxxxxxx" autocomplete="new-password"  required>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+
+              <button type="submit" id="createProjectBtn" class="btn btn-primary btn-lg" disabled>
+                <i class="mdi mdi-plus-circle"></i> Create Project
+              </button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function authFetch(url, options = {}) {
+  return fetch(url, options).then(response => {
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = '/login';
+      return Promise.reject(new Error('Session expired. Redirecting to login.'));
+    }
+    return response;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  try {
+    console.log('DOM Content Loaded - Create Project page');
+  
+  // Form submission with loading
+  const form = document.querySelector('form[action*="projects/create"]');
+  const submitBtn = document.getElementById('createProjectBtn');
+  
+  console.log('Form found:', form);
+  console.log('Submit button found:', submitBtn);
+  
+  if (!form) {
+    console.error('Create project form not found!');
+    return;
+  }
+  
+  // Add click listener to submit button for debugging
+  submitBtn.addEventListener('click', function(e) {
+    console.log('Submit button clicked!');
+    // Manually trigger form submission if the button is enabled
+    if (!submitBtn.disabled) {
+      console.log('Manually triggering form submission...');
+      form.dispatchEvent(new Event('submit', { bubbles: true }));
+    }
+  });
+  
+  form.addEventListener('submit', async function(e) {
+    console.log('Form submit event triggered!');
+    e.preventDefault();
+    
+    console.log('Form submission started');
+    
+    // Check if loading functions exist
+    if (typeof showLoading !== 'function') {
+      console.error('showLoading function not found!');
+      alert('Loading function not available');
+      return;
+    }
+    
+    if (typeof setButtonLoading !== 'function') {
+      console.error('setButtonLoading function not found!');
+      alert('Button loading function not available');
+      return;
+    }
+    
+    // Check if loading overlay exists
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (!loadingOverlay) {
+      console.error('Loading overlay element not found!');
+      alert('Loading overlay not found');
+      return;
+    }
+    
+    console.log('Loading overlay found:', loadingOverlay);
+    console.log('Loading overlay current display:', loadingOverlay.style.display);
+    
+    // Show loading state immediately
+    showLoading('Creating Project...');
+    setButtonLoading(submitBtn, true);
+    
+    console.log('Loading state set');
+    console.log('Loading overlay display after showLoading:', loadingOverlay.style.display);
+    
+    // Force a repaint to ensure loading is visible
+    loadingOverlay.offsetHeight;
+    
+    // Ensure loading overlay is visible with inline styles
+    loadingOverlay.style.display = 'flex';
+    loadingOverlay.style.zIndex = '99999';
+    loadingOverlay.style.position = 'fixed';
+    loadingOverlay.style.top = '0';
+    loadingOverlay.style.left = '0';
+    loadingOverlay.style.width = '100%';
+    loadingOverlay.style.height = '100%';
+    loadingOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    loadingOverlay.style.justifyContent = 'center';
+    loadingOverlay.style.alignItems = 'center';
+    
+    // Additional debugging - check if overlay is actually visible
+    setTimeout(() => {
+      console.log('Loading overlay display after timeout:', loadingOverlay.style.display);
+      console.log('Loading overlay computed style:', window.getComputedStyle(loadingOverlay).display);
+      console.log('Loading overlay z-index:', window.getComputedStyle(loadingOverlay).zIndex);
+    }, 100);
+    
+    // Add a small delay to ensure loading is visible before validation
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    console.log('Starting form validation...');
+    const visibleRequiredInputs = document.querySelectorAll('.social-credentials:not(.d-none) input[required]');
+    console.log('Found', visibleRequiredInputs.length, 'required inputs');
+    
+    let allFilled = true;
+    visibleRequiredInputs.forEach(input => {
+      console.log('Checking input:', input.name, 'value:', input.value);
+      if (!input.value.trim()) {
+        allFilled = false;
+        input.classList.add('is-invalid');
+        console.log('Input', input.name, 'is empty');
+      } else {
+        input.classList.remove('is-invalid');
+        console.log('Input', input.name, 'is filled');
+      }
+    });
+    
+    if (!allFilled) {
+      console.log('Form validation failed - hiding loading');
+      showCustomNotification('Please fill in all required credential fields for the selected social media.');
+      setButtonLoading(submitBtn, false);
+      hideLoading();
+      return;
+    }
+    
+    console.log('Form validation passed - proceeding with submission');
+
+    try {
+      console.log('Starting API request');
+      const formData = new FormData(form);
+      const response = await authFetch(form.action, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+
+      console.log('API response received:', response.status);
+      
+      if (response.ok) {
+        console.log('Project created successfully, redirecting...');
+        showLoading('Redirecting to review page...');
+        // Force repaint again
+        document.getElementById('loadingOverlay').offsetHeight;
+        setTimeout(() => {
+          window.location.href = response.url;
+        }, 1200);
+      } else {
+        console.log('API error response');
+        const errorData = await response.json();
+        showCustomNotification('Error creating project: ' + (errorData.detail || 'Unknown error'));
+        setButtonLoading(submitBtn, false);
+        hideLoading();
+      }
+    } catch (error) {
+      console.error('Error during project creation:', error);
+      showCustomNotification('Error creating project. Please try again.');
+      setButtonLoading(submitBtn, false);
+      hideLoading();
+    }
+  });
+
+  // Clear the Type of Content field on page load
+  const contentTypeField = document.getElementById('content_type');
+  if (contentTypeField) {
+    contentTypeField.value = '';
+    contentTypeField.setAttribute('autocomplete', 'new-password');
+    
+    // Disable autofill suggestions
+    contentTypeField.addEventListener('input', function() {
+      this.setAttribute('autocomplete', 'new-password');
+      this.style.color = '#2c3e50';
+      this.style.webkitTextFillColor = '#2c3e50';
+    });
+    
+    // Prevent autofill on focus
+    contentTypeField.addEventListener('focus', function() {
+      this.setAttribute('autocomplete', 'new-password');
+      this.style.color = '#2c3e50';
+      this.style.webkitTextFillColor = '#2c3e50';
+      if (this.value && this.value !== '') {
+        this.value = '';
+      }
+    });
+  }
+
+  // Aggressive autofill prevention for all credential fields
+  const allInputs = document.querySelectorAll('input[type="text"], input[type="password"]');
+  allInputs.forEach(input => {
+    // Skip the Type of Content field - don't apply autofill prevention to it
+    if (input.name === 'content_type' || input.id === 'content_type') {
+      return;
+    }
+    
+    // Set initial attributes
+    input.setAttribute('autocomplete', 'new-password');
+    input.setAttribute('data-lpignore', 'true');
+    input.setAttribute('data-form-type', 'other');
+    
+    // Force text color
+    input.style.color = '#2c3e50';
+    input.style.webkitTextFillColor = '#2c3e50';
+    
+    // Only clear if it's an autofilled value, not user-entered value
+    input.addEventListener('focus', function() {
+      this.setAttribute('autocomplete', 'new-password');
+      this.style.color = '#ffffff';
+      this.style.webkitTextFillColor = '#ffffff';
+      // Don't clear the value if user has already typed something
+    });
+    
+    // Prevent autofill on input
+    input.addEventListener('input', function() {
+      this.setAttribute('autocomplete', 'new-password');
+      this.style.color = '#ffffff';
+      this.style.webkitTextFillColor = '#ffffff';
+    });
+  });
+
+  // Special handling for password fields
+  const passwordFields = document.querySelectorAll('.password-field');
+  passwordFields.forEach(field => {
+    // Start as text type to prevent autofill
+    field.type = 'text';
+    field.style.fontFamily = 'monospace';
+    
+    field.addEventListener('focus', function() {
+      // Delay the conversion to prevent autofill
+      setTimeout(() => {
+        this.type = 'password';
+        // Don't clear the value
+        this.setAttribute('autocomplete', 'new-password');
+      }, 100);
+    });
+    
+    field.addEventListener('blur', function() {
+      // Convert back to text if empty
+      if (!this.value) {
+        this.type = 'text';
+      }
+    });
+  });
+
+
+  // Show/hide credentials based on selected social medias
+  const checkboxes = document.querySelectorAll('.social-media-checkbox');
+  const credentialsMap = {
+    instagram: 'instagram-credentials',
+    facebook: 'facebook-credentials',
+    X: 'X-credentials',
+    linkedin: 'linkedin-credentials',
+    discord: 'discord-credentials',
+    telegram: 'telegram-credentials'
+  };
+
+  function updateRequiredFields() {
+    Object.values(credentialsMap).forEach(credClass => {
+      const credDiv = document.querySelector('.' + credClass);
+      if (credDiv) {
+        credDiv.classList.add('d-none');
+        credDiv.querySelectorAll('input[name]').forEach(input => {
+          input.required = false;
+        });
+      }
+    });
+    checkboxes.forEach(cb => {
+      const credClass = credentialsMap[cb.value];
+      const credDiv = document.querySelector('.' + credClass);
+      if (cb.checked) {
+        if (credDiv) {
+          credDiv.classList.remove('d-none');
+          credDiv.querySelectorAll('input[name]').forEach(input => {
+            input.required = true;
+          });
+        }
+      } else {
+        if (credDiv) {
+          credDiv.classList.add('d-none');
+          credDiv.querySelectorAll('input[name]').forEach(input => {
+            input.value = '';
+          });
+        }
+      }
+    });
+  }
+
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', updateRequiredFields);
+  });
+
+  // Initial call to set up the form correctly on page load
+  updateRequiredFields();
+
+
+
+  // --- Social Media Checkbox: Require at least one checked to enable button ---
+  const socialCheckboxes = document.querySelectorAll('.social-media-checkbox');
+  const createProjectBtn = document.getElementById('createProjectBtn');
+
+  function toggleCreateButton() {
+    const oneChecked = Array.from(socialCheckboxes).some(cb => cb.checked);
+    createProjectBtn.disabled = !oneChecked;
+  }
+
+  // Initial check on page load
+  toggleCreateButton();
+
+  // Add event listeners to all checkboxes
+  socialCheckboxes.forEach(cb => {
+    cb.addEventListener('change', toggleCreateButton);
+  });
+  } catch (error) {
+    console.error('Error in create project script:', error);
+    alert('Error loading create project page: ' + error.message);
+  }
+});
+</script>
+{% endblock %}

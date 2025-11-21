@@ -1,0 +1,383 @@
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c9d6ff 0%, #e2eafc 100%);
+  background-attachment: fixed;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  color: #1a237e;
+}
+
+h1, h2, h3, h4, h5, h6, .card-title, .sidebar .nav .menu-title, .navbar-profile-name {
+  color: #1a237e !important;
+  font-weight: 800 !important;
+  text-shadow: 0 2px 8px #fff6, 0 1px 2px #7f9cf522;
+  letter-spacing: 0.5px;
+}
+
+.card-title, .sidebar .nav .menu-title {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+}
+
+.text-muted, .sidebar .nav .nav-category, .sidebar .profile-name span, .navbar .navbar-profile-name, .sidebar .nav .nav-link {
+  color: #3a4a7e !important;
+  opacity: 0.85 !important;
+  font-weight: 500 !important;
+}
+
+.sidebar .nav .nav-link.active, .sidebar .nav .nav-link:hover {
+  color: #1a237e !important;
+  background: rgba(180, 200, 255, 0.18) !important;
+  font-weight: 700 !important;
+}
+
+.glass, .glass-card, .glass-panel, .glass-navbar, .glass-sidebar, .glass-form, .glass-content {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+}
+
+.glass-navbar, .navbar, nav {
+  background: rgba(200, 220, 255, 0.22) !important;
+  box-shadow: 0 2px 16px 0 rgba(31, 38, 135, 0.10);
+  border-bottom: 1.5px solid rgba(255,255,255,0.18);
+}
+
+.glass-sidebar, .sidebar {
+  background: rgba(200, 220, 255, 0.18) !important;
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10);
+  border-right: 1.5px solid rgba(255,255,255,0.18);
+}
+
+.card, .content-wrapper, .main-panel, .form-control, .modal-content {
+  background: rgba(255,255,255,0.22) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border: 1.5px solid rgba(255,255,255,0.18) !important;
+}
+
+input, textarea, select {
+  background: rgba(255,255,255,0.32) !important;
+  border-radius: 10px !important;
+  border: 1.2px solid rgba(200,220,255,0.22) !important;
+  color: #1a237e !important;
+  font-weight: 600 !important;
+}
+
+.btn, button {
+  background: rgba(180, 200, 255, 0.32) !important;
+  color: #1a237e !important;
+  border-radius: 12px !important;
+  border: 1.2px solid rgba(200,220,255,0.22) !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.08) !important;
+  transition: background 0.2s, color 0.2s;
+  text-shadow: 0 1px 2px #fff8;
+}
+
+.btn:hover, button:hover {
+  background: rgba(120, 160, 255, 0.38) !important;
+  color: #fff !important;
+}
+
+.sidebar, .glass-sidebar {
+  color: #1a237e !important;
+}
+
+.navbar, .glass-navbar {
+  color: #1a237e !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  background: rgba(200,220,255,0.12);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(120,160,255,0.18);
+  border-radius: 8px;
+}
+
+/* Utility for extra contrast if needed */
+.text-strong {
+  color: #0d1333 !important;
+  font-weight: 900 !important;
+} 
+
+.preview-item, .preview-item-content, .preview-item .preview-item-content, .preview-item .preview-thumbnail, .preview-item .preview-item-content p, .preview-item .preview-item-content span, .preview-item .preview-item-content a {
+  background: rgba(180, 200, 255, 0.18) !important;
+  color: #1a237e !important;
+  font-weight: 700 !important;
+  text-shadow: none !important;
+}
+
+.preview-item .preview-item-content .text-white, .preview-item .preview-item-content .text-light {
+  color: #1a237e !important;
+}
+
+.preview-item .preview-item-content .text-muted {
+  color: #3a4a7e !important;
+  opacity: 0.85 !important;
+}
+
+/* Remove solid black background from support and preview-item */
+.sidebar .nav .nav-item .support, .sidebar .nav .nav-item .btn-support, .sidebar .nav .nav-item .nav-link.support, .preview-item, .preview-item-content {
+  background: rgba(180, 200, 255, 0.18) !important;
+  box-shadow: 0 2px 8px 0 rgba(31, 38, 135, 0.10) !important;
+  border: 1.5px solid rgba(180,200,255,0.18) !important;
+}
+
+.sidebar .nav .nav-item .support:hover, .sidebar .nav .nav-item .btn-support:hover, .sidebar .nav .nav-item .nav-link.support:hover {
+  background: rgba(80, 120, 255, 0.32) !important;
+  color: #fff !important;
+}
+
+.card, .main-panel, .sidebar, .navbar, .glass-content, .glass-sidebar, .glass-navbar {
+  color: #1a237e !important;
+}
+
+.card .text-white, .main-panel .text-white, .sidebar .text-white, .navbar .text-white {
+  color: #1a237e !important;
+}
+
+.card .btn, .main-panel .btn, .sidebar .btn, .navbar .btn {
+  color: #1a237e !important;
+  font-weight: 700 !important;
+}
+
+.card .btn:hover, .main-panel .btn:hover, .sidebar .btn:hover, .navbar .btn:hover {
+  color: #fff !important;
+} 
+
+/* Dark glassmorphism for cards/sidebar: high-contrast white text, no shadow */
+.glass-dark, .glass-card-dark, .sidebar .nav .nav-item .support.glass-dark {
+  background: rgba(13, 13, 13, 0.38) !important;
+  color: #fff !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+.glass-dark a, .glass-dark .card-title, .glass-dark .menu-title, .glass-dark .amount {
+  color: #fff !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+} 
+
+/* === Custom fixes for transaction cards and donut chart center label === */
+.glass-dark .transaction-title,
+.glass-dark .transaction-amount {
+  color: #fff !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+.donut-center-label {
+  color: #1a237e !important;
+  font-weight: 700;
+  text-shadow: none !important;
+} 
+
+/* Profile dropdown glassmorphism override */
+.dropdown-menu.navbar-dropdown.preview-list {
+  background: rgba(200, 220, 255, 0.18) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10) !important;
+  backdrop-filter: blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
+  border-radius: 18px !important;
+  border: 1.5px solid rgba(255,255,255,0.18) !important;
+}
+
+.dropdown-menu.navbar-dropdown.preview-list h6,
+.dropdown-menu.navbar-dropdown.preview-list .preview-subject,
+.dropdown-menu.navbar-dropdown.preview-list .preview-item-content,
+.dropdown-menu.navbar-dropdown.preview-list .preview-icon {
+  color: #1a237e !important;
+  text-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+.dropdown-menu.navbar-dropdown.preview-list .preview-icon {
+  background: rgba(200, 220, 255, 0.18) !important;
+  border-radius: 50% !important;
+} 
+
+/* Sidebar brand/logo glassmorphism override */
+.sidebar-brand-wrapper, .sidebar .sidebar-brand {
+  background: rgba(200, 220, 255, 0.18) !important;
+  box-shadow: 0 4px 24px 0 rgba(31, 38, 135, 0.10) !important;
+  border-bottom: 1.5px solid rgba(255,255,255,0.18) !important;
+}
+
+/* Preview icon glassmorphism override */
+.preview-icon.bg-dark, .preview-icon.bg-dark.rounded-circle {
+  background: rgba(200, 220, 255, 0.18) !important;
+  color: #1a237e !important;
+} 
+
+.bg-dark {
+  background: rgba(200, 220, 255, 0.18) !important;
+  color: #1a237e !important;
+} 
+
+.social-checkboxes {
+  display: flex !important;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.social-checkboxes .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+} 
+
+.image-radio-group {
+  display: flex !important;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.image-radio-group .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 999; /* ensure it stays above other elements */
+}
+.main-panel {
+  margin-left: 130px;
+  margin-right: -110px;
+}
+#calendar {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+body .dropdown-menu,
+body .dropdown-menu.navbar-dropdown,
+body .dropdown-menu.navbar-dropdown.preview-list {
+  background: linear-gradient(135deg, #c9d6ff 0%, #e2eafc 100%) !important;
+  box-shadow: 0 4px 16px rgba(44,62,80,0.10);
+  border-radius: 12px;
+  border: 1px solid #e3eafc;
+  z-index: 1050;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+.fc-event, .fc-event .fc-content {
+  background: transparent !important;
+  border: none !important;
+  color: #222 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fc-event .fc-title {
+  display: none !important;
+}
+
+.glass-card .form-control, .glass-card .glass-input {
+  background: #f4f8fb !important;
+  color: #1a237e !important;
+  border: 1px solid #e3eafc;
+  border-radius: 10px;
+  box-shadow: none;
+  font-weight: 500;
+}
+.glass-card .form-control:focus, .glass-card .glass-input:focus {
+  background: #fff !important;
+  color: #1a237e !important;
+  border-color: #b3c6f7;
+  outline: none;
+}
+/* Fix for Chrome autofill */
+.glass-card input:-webkit-autofill,
+.glass-card input:-webkit-autofill:focus,
+.glass-card input:-webkit-autofill:hover,
+.glass-card input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f4f8fb inset !important;
+  box-shadow: 0 0 0 1000px #f4f8fb inset !important;
+  -webkit-text-fill-color: #1a237e !important;
+  caret-color: #1a237e !important;
+}
+
+body .glass-card .form-control,
+body .glass-card .glass-input {
+  background: #f4f8fb !important;
+  color: #1a237e !important;
+  border: 1px solid #e3eafc !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+  font-weight: 500 !important;
+  caret-color: #1a237e !important;
+  transition: background 0.2s;
+}
+
+/* Also for active and not just focus */
+body .glass-card .form-control:focus,
+body .glass-card .glass-input:focus,
+body .glass-card .form-control:active,
+body .glass-card .glass-input:active {
+  background: #fff !important;
+  color: #1a237e !important;
+  border-color: #b3c6f7 !important;
+  outline: none !important;
+}
+
+/* For Chrome/Edge autofill */
+body .glass-card input:-webkit-autofill,
+body .glass-card input:-webkit-autofill:focus,
+body .glass-card input:-webkit-autofill:hover,
+body .glass-card input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f4f8fb inset !important;
+  box-shadow: 0 0 0 1000px #f4f8fb inset !important;
+  -webkit-text-fill-color: #1a237e !important;
+  caret-color: #1a237e !important;
+}
+
+/* Placeholder color for glass-card inputs */
+body .glass-card .form-control::placeholder,
+body .glass-card .glass-input::placeholder {
+  color: #1a237e !important;   /* or use #3a4a7e for a lighter blue, or #888 for light gray */
+  opacity: 1 !important;
+}
+
+/* For cross-browser compatibility */
+body .glass-card .form-control::-webkit-input-placeholder,
+body .glass-card .glass-input::-webkit-input-placeholder {
+  color: #1a237e !important;
+  opacity: 1 !important;
+}
+body .glass-card .form-control:-ms-input-placeholder,
+body .glass-card .glass-input:-ms-input-placeholder {
+  color: #1a237e !important;
+  opacity: 1 !important;
+}
+body .glass-card .form-control::-ms-input-placeholder,
+body .glass-card .glass-input::-ms-input-placeholder {
+  color: #1a237e !important;
+  opacity: 1 !important;
+}
+
+body .glass-card, .glass-card {
+  background: #f4f8fb !important;
+  color: #1a237e !important;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(44,62,80,0.08);
+}

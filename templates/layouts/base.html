@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="shortcut icon" href="/static/assets/images/favicon.png" />
+
+    <title> {% block title %}{% endblock %}</title>
+
+    <!-- Purple Admin Theme CSS -->
+    <link
+      rel="stylesheet"
+      href="/static/assets/vendors/mdi/css/materialdesignicons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="/static/assets/vendors/css/vendor.bundle.base.css"
+    />
+    <link rel="stylesheet" href="/static/assets/css/style.css" />
+    <link rel="stylesheet" href="/static/css/purple-admin.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css"
+    />
+
+    <!-- Specific Plugin CSS goes HERE -->
+    {% block plugin_stylesheets %}{% endblock plugin_stylesheets %}
+
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+    <!-- Loading Spinner CSS -->
+    <style>
+          .loading-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.7);
+              display: none;
+              justify-content: center;
+              align-items: center;
+              z-index: 99999;
+          }
+
+          .loading-overlay[style*="display: flex"] { z-index: 99999 !important; }
+
+          .loading-spinner {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 20px;
+          }
+
+          .spinner {
+              width: 40px;
+              height: 40px;
+              border: 4px solid #f3f3f3;
+              border-top: 4px solid #6f42c1;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+          }
+
+          @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+          }
+
+          .loading-text {
+              font-size: 16px;
+              font-weight: 500;
+              color: #ffffff;
+          }
+
+          .btn-loading {
+              position: relative;
+              pointer-events: none;
+              opacity: 0.7;
+          }
+
+          .btn-loading::after {
+              content: '';
+              position: absolute;
+              width: 16px;
+              height: 16px;
+              margin: auto;
+              border: 2px solid transparent;
+              border-top-color: #ffffff;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+              top: 0;
+              left: 0;
+              bottom: 0;
+              right: 0;
+          }
+          
+          /* Notification System Styles */
+          .notification-dropdown {
+              max-height: 400px;
+              overflow-y: auto;
+              min-width: 320px;
+          }
+          
+          .notification-item {
+              cursor: pointer;
+              transition: background-color 0.2s ease;
+              padding: 12px 15px;
+              border-bottom: 1px solid #e9ecef;
+          }
+          
+          .notification-item:hover {
+              background-color:rgb(0, 0, 0);
+          }
+          
+          .notification-item.unread {
+              background-color: rgba(111, 66, 193, 0.05);
+              border-left: 3px solid #6f42c1;
+          }
+          
+          .notification-item.unread:hover {
+              background-color: rgba(111, 66, 193, 0.1);
+          }
+          
+          .notification-count {
+              position: absolute;
+              top: -5px;
+              right: -5px;
+              background-color: #dc3545;
+              color: white;
+              border-radius: 50%;
+              width: 18px;
+              height: 18px;
+              font-size: 10px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: bold;
+          }
+          
+          .notification-time {
+              font-size: 11px;
+              color: #6c757d;
+              margin-top: 4px;
+          }
+          
+          .notification-actions {
+              border-top: 1px solid #e9ecef;
+              padding: 12px 15px;
+              background-color: #f8f9fa;
+              display: flex;
+              justify-content: space-between;
+              gap: 10px;
+          }
+          
+          .notification-actions .btn {
+              font-size: 12px;
+              padding: 6px 12px;
+              border-radius: 4px;
+          }
+          
+          .notification-actions .btn-outline-primary {
+              color: #6f42c1;
+              border-color: #6f42c1;
+          }
+          
+          .notification-actions .btn-outline-primary:hover {
+              background-color: #6f42c1;
+              color: white;
+          }
+          
+          .notification-actions .btn-outline-danger {
+              color: #dc3545;
+              border-color: #dc3545;
+          }
+          
+          .notification-actions .btn-outline-danger:hover {
+              background-color: #dc3545;
+              color: white;
+          }
+          
+          .notification-empty {
+              padding: 20px;
+              text-align: center;
+              color: #6c757d;
+              font-style: italic;
+          }
+          
+          .notification-icon {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 12px;
+              flex-shrink: 0;
+          }
+          
+          .notification-icon.success {
+              background-color: #28a745;
+              color: white;
+          }
+          
+          .notification-icon.warning {
+              background-color: #ffc107;
+              color: #212529;
+          }
+          
+          .notification-icon.error {
+              background-color: #dc3545;
+              color: white;
+          }
+          
+          .notification-icon.info {
+              background-color: #17a2b8;
+              color: white;
+          }
+          
+          .notification-content {
+              flex: 1;
+              min-width: 0;
+          }
+          
+          .notification-title {
+              font-weight: 600;
+              margin-bottom: 4px;
+              color:rgb(255, 255, 255);
+          }
+          
+          .notification-message {
+              color: #6c757d;
+              font-size: 13px;
+              line-height: 1.4;
+          }
+
+          .dropdown-menu .text-gray {
+              color: #ccc !important;
+          }
+
+          .dropdown-menu .ellipsis {
+              color: #ccc !important;
+          }
+
+          /* Force white text for all dropdown content */
+          .navbar-dropdown .preview-subject,
+          .navbar-dropdown .dropdown-item,
+          .navbar-dropdown h6,
+          .navbar-dropdown p {
+              color: white !important;
+          }
+
+          .navbar-dropdown .text-dark {
+              color: white !important;
+          }
+
+          /* Specific overrides for dropdown text */
+          .preview-list .preview-subject,
+          .preview-list .dropdown-item,
+          .preview-list h6,
+          .preview-list p {
+              color: white !important;
+          }
+
+          .preview-list .text-dark {
+              color: white !important;
+          }
+
+          /* Override any existing text-dark classes */
+          .text-dark {
+              color: white !important;
+          }
+
+          /* Ensure all text in dropdowns is white */
+          .dropdown-menu .preview-item-content * {
+              color: white !important;
+          }
+
+          /* Navigation search bar styling - consistent across all pages */
+          .navbar .search .form-control,
+          .navbar .navbar-menu-wrapper .search input,
+          .navbar .navbar-menu-wrapper .search .form-control {
+              background-color: #ffffff !important;
+              border: 1px solid #e9ecef !important;
+              color: #333 !important;
+              border-radius left: 20px !important;
+              padding: 8px 15px !important;
+          }
+
+          .navbar .search .form-control:focus,
+          .navbar .navbar-menu-wrapper .search input:focus,
+          .navbar .navbar-menu-wrapper .search .form-control:focus {
+              background-color:rgb(0, 0, 0) !important;
+              border-color: #007bff !important;
+              color: #333 !important;
+              box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+          }
+
+          .navbar .search .form-control::placeholder,
+          .navbar .navbar-menu-wrapper .search input::placeholder,
+          .navbar .navbar-menu-wrapper .search .form-control::placeholder {
+              color: #6c757d !important;
+              opacity: 0.7 !important;
+          }
+
+          .navbar .search .btn,
+          .navbar .navbar-menu-wrapper .search .btn {
+              background-color: #007bff !important;
+              border-color: #007bff !important;
+              color: white !important;
+          }
+
+          .navbar .search .btn:hover,
+          .navbar .navbar-menu-wrapper .search .btn:hover {
+              background-color: #0056b3 !important;
+              border-color: #0056b3 !important;
+          }
+
+          /* Loading Overlay Styles */
+          .loading-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background-color: rgba(0, 0, 0, 0.7);
+              display: none;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999;
+          }
+
+          .loading-spinner {
+              text-align: center;
+              color: white;
+          }
+
+          .spinner {
+              width: 50px;
+              height: 50px;
+              border: 5px solid #f3f3f3;
+              border-top: 5px solid #007bff;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+              margin: 0 auto 20px;
+          }
+
+          @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+          }
+
+          .loading-text {
+              font-size: 18px;
+              font-weight: bold;
+              color: white;
+          }
+
+          /* Button Loading State */
+          .btn-loading {
+              position: relative;
+              color: transparent !important;
+          }
+
+          .btn-loading::after {
+              content: '';
+              position: absolute;
+              width: 16px;
+              height: 16px;
+              top: 50%;
+              left: 50%;
+              margin-left: -8px;
+              margin-top: -8px;
+              border: 2px solid transparent;
+              border-top: 2px solid currentColor;
+              border-radius: 50%;
+              animation: spin 1s linear infinite;
+          }
+          .custom-notification {
+        position: fixed;
+        top: 30px;
+        right: 30px;
+        min-width: 300px;
+        max-width: 400px;
+        background: #222;
+        color: #fff;
+        padding: 18px 40px 18px 18px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        z-index: 100000;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: fadeIn 0.3s;
+      }
+      .custom-notification.success { background: #28a745; }
+      .custom-notification.error { background: #dc3545; }
+      .custom-notification.partial { background: #343a40; }
+      .custom-notification .close-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 1.3em;
+        margin-left: auto;
+        cursor: pointer;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px);}
+        to { opacity: 1; transform: translateY(0);}
+      }
+      .custom-confirm-modal {
+          position: fixed;
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          background: rgba(0,0,0,0.5);
+          z-index: 100001;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .custom-confirm-content {
+          background: #222;
+          color: #fff;
+          padding: 32px 32px 24px 32px;
+          border-radius: 10px;
+          min-width: 320px;
+          text-align: center;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+        }
+        .custom-confirm-actions {
+          margin-top: 24px;
+          display: flex;
+          justify-content: center;
+          gap: 20px;
+        }
+    </style>
+  </head>
+  <body>
+    <div class="container-scroller">
+      {% include 'includes/sidebar.html' with context %}
+
+      <!-- partial -->
+      <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_navbar.html -->
+        {% include 'includes/navigation.html' with context %}
+
+        <!-- partial -->
+        <div class="main-panel">{% block content %}{% endblock content %}</div>
+        <!-- main-panel ends -->
+      </div>
+      <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+      <div class="loading-spinner">
+        <div class="spinner"></div>
+        <div class="loading-text">LOADING...</div>
+      </div>
+    </div>
+
+    <div
+      id="customNotification"
+      class="custom-notification"
+      style="display: none"
+    >
+      <span id="customNotificationMessage"></span>
+      <button onclick="hideCustomNotification()" class="close-btn">
+        &times;
+      </button>
+    </div>
+
+    <div
+      id="customConfirmModal"
+      class="custom-confirm-modal"
+      style="display: none"
+    >
+      <div class="custom-confirm-content">
+        <span id="customConfirmMessage"></span>
+        <div class="custom-confirm-actions">
+          <button id="customConfirmYes" class="btn btn-danger">Yes</button>
+          <button id="customConfirmNo" class="btn btn-secondary">No</button>
+        </div>
+      </div>
+    </div>
+    <!-- plugins:js -->
+    <script src="/static/assets/vendors/js/vendor.bundle.base.js"></script>
+    <!-- endinject -->
+
+    <!-- Specific Plugin JS goes HERE  -->
+    {% block plugin_javascripts %}{% endblock plugin_javascripts %}
+
+    <!-- inject:js -->
+    <script src="/static/assets/js/off-canvas.js"></script>
+    <script src="/static/assets/js/hoverable-collapse.js"></script>
+    <script src="/static/assets/js/misc.js"></script>
+    <script src="/static/assets/js/settings.js"></script>
+    <script src="/static/assets/js/todolist.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+    <!-- endinject -->
+
+    <!-- Specific Page JS goes HERE  -->
+    {% block javascripts %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var calendarEl = document.getElementById("calendar");
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: "dayGridMonth",
+          height: 500,
+          events: [
+            {
+              title: "Crypto Campaign",
+              start: "2025-07-27",
+              backgroundColor: "#e83e8c",
+              borderColor: "#e83e8c",
+            },
+            {
+              title: "Instagram Reel",
+              start: "2025-07-28",
+              backgroundColor: "#28a745",
+              borderColor: "#28a745",
+            },
+          ],
+        });
+
+        if (calendarEl) {
+          calendar.render();
+        }
+      });
+    </script>
+    {% endblock javascripts %}
+
+    <!-- Loading Functions -->
+    <script>
+      // Global loading functions
+      function showLoading(message = "LOADING...") {
+        console.log("showLoading called with message:", message);
+        const overlay = document.getElementById("loadingOverlay");
+        if (!overlay) {
+          console.error("Loading overlay not found!");
+          return;
+        }
+        const text = overlay.querySelector(".loading-text");
+        if (text) {
+          text.textContent = message;
+        }
+        overlay.style.display = "flex";
+        console.log("Loading overlay should now be visible");
+      }
+
+      function hideLoading() {
+        console.log("hideLoading called");
+        const overlay = document.getElementById("loadingOverlay");
+        if (overlay) {
+          overlay.style.display = "none";
+          console.log("Loading overlay hidden");
+        }
+      }
+
+      // Button loading functions
+      function setButtonLoading(button, isLoading) {
+        if (isLoading) {
+          button.classList.add("btn-loading");
+          button.disabled = true;
+          button.dataset.originalText = button.textContent;
+          button.textContent = "";
+        } else {
+          button.classList.remove("btn-loading");
+          button.disabled = false;
+          if (button.dataset.originalText) {
+            button.textContent = button.dataset.originalText;
+          }
+        }
+      }
+      function showCustomNotification(
+        message,
+        type = "success",
+        duration = 4000
+      ) {
+        const box = document.getElementById("customNotification");
+        const msg = document.getElementById("customNotificationMessage");
+        box.className = "custom-notification " + type;
+        msg.innerHTML = message;
+        box.style.display = "flex";
+        if (box._timeout) clearTimeout(box._timeout);
+        box._timeout = setTimeout(hideCustomNotification, duration);
+      }
+      function hideCustomNotification() {
+        const box = document.getElementById("customNotification");
+        box.style.display = "none";
+      }
+
+      function showCustomConfirm(message, onYes, onNo) {
+        const modal = document.getElementById("customConfirmModal");
+        const msg = document.getElementById("customConfirmMessage");
+        msg.textContent = message;
+        modal.style.display = "flex";
+        const yesBtn = document.getElementById("customConfirmYes");
+        const noBtn = document.getElementById("customConfirmNo");
+        // Remove previous listeners
+        yesBtn.onclick = () => {
+          modal.style.display = "none";
+          onYes && onYes();
+        };
+        noBtn.onclick = () => {
+          modal.style.display = "none";
+          onNo && onNo();
+        };
+      }
+      // Enhanced fetch with loading
+      async function fetchWithLoading(
+        url,
+        options = {},
+        loadingMessage = "LOADING..."
+      ) {
+        showLoading(loadingMessage);
+        try {
+          const response = await fetch(url, options);
+          const data = await response.json();
+          return { response, data };
+        } finally {
+          hideLoading();
+        }
+      }
+    </script>
+    <script>
+      // Global fetch override for auth redirect
+      const originalFetch = window.fetch;
+      window.fetch = function (...args) {
+        return originalFetch(...args).then((response) => {
+          // Check if this is an admin privileges check request
+          const url = args[0];
+          const isAdminCheck = typeof url === 'string' && url.includes('/check_admin_privileges');
+          
+          console.log('Fetch override - URL:', url, 'Status:', response.status, 'IsAdminCheck:', isAdminCheck);
+          
+          if (response.status === 401 || response.status === 403) {
+            // Don't redirect for admin privilege checks - let the calling function handle it
+            if (isAdminCheck) {
+              console.log('Admin check detected, not redirecting');
+              return response;
+            }
+            // For other requests, redirect to login
+            console.log('Redirecting to login for status:', response.status);
+            window.location.href = "/login";
+            return Promise.reject(
+              new Error("Session expired. Redirecting to login.")
+            );
+          }
+          return response;
+        });
+      };
+      
+      // Admin privileges check function
+      window.checkAdminPrivileges = function(event) {
+        event.preventDefault();
+        
+        console.log('Checking admin privileges...');
+        
+        // Show loading state
+        showLoading('Checking admin privileges...');
+        
+        // Make a request to check admin status
+        fetch('/check_admin_privileges', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          credentials: 'same-origin'
+        })
+        .then(response => {
+          console.log('Admin check response status:', response.status);
+          hideLoading();
+          
+          if (response.status === 200) {
+            // User has admin privileges, redirect to admin panel
+            console.log('Admin privileges confirmed, redirecting to admin panel');
+            window.location.href = '/admin_panel';
+          } else if (response.status === 403) {
+            // User doesn't have admin privileges, show notification
+            console.log('Access denied - showing notification');
+            showCustomNotification('You do not have admin privileges to access this feature.', 'error');
+          } else if (response.status === 401) {
+            // User not authenticated, redirect to login
+            console.log('Not authenticated, redirecting to login');
+            window.location.href = '/login';
+          } else {
+            // Other error
+            console.log('Other error:', response.status);
+            showCustomNotification('Error checking admin privileges. Please try again.', 'error');
+          }
+        })
+        .catch(error => {
+          hideLoading();
+          console.error('Error checking admin privileges:', error);
+          showCustomNotification('Error checking admin privileges. Please try again.', 'error');
+        });
+      };
+    </script>
+    
+    <!-- Notification System JavaScript -->
+    <script>
+      // Notification system variables
+      let notificationPollingInterval;
+      let lastNotificationCount = 0;
+      
+      // Initialize notification system
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('Initializing notification system...');
+        // Initialize the last notification count
+        lastNotificationCount = 0;
+        
+        // Load initial notifications
+        loadNotifications();
+        
+        // Start polling after a short delay
+        setTimeout(() => {
+          startNotificationPolling();
+        }, 1000);
+        
+        // Add event listener for Bootstrap dropdown show event
+        const notificationDropdown = document.querySelector('[aria-labelledby="notificationDropdown"]');
+        if (notificationDropdown) {
+          notificationDropdown.addEventListener('show.bs.dropdown', function() {
+            console.log('Dropdown opening - reloading notifications');
+            loadNotifications();
+          });
+        }
+        
+        // Alternative: Listen for click on the dropdown toggle
+        const notificationToggle = document.getElementById('notificationDropdown');
+        if (notificationToggle) {
+          notificationToggle.addEventListener('click', function(e) {
+            console.log('Notification dropdown clicked');
+            // Small delay to ensure dropdown is opened before loading
+            setTimeout(() => {
+              loadNotifications();
+            }, 100);
+          });
+        }
+        
+        // Add manual refresh function for debugging
+        window.refreshNotifications = function() {
+          console.log('Manual refresh called');
+          loadNotifications();
+        };
+        
+        console.log('Notification system initialized');
+      });
+      
+      // Load notifications from API
+      async function loadNotifications() {
+        console.log('Loading notifications...');
+        try {
+          const response = await fetch('/api/v1/notifications?limit=10', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+          });
+          
+          console.log('Notification response status:', response.status);
+          
+          if (response.ok) {
+            const notifications = await response.json();
+            console.log('Loaded notifications:', notifications);
+            displayNotifications(notifications);
+            const unreadCount = notifications.filter(n => !n.is_read).length;
+            updateNotificationCount(unreadCount);
+          } else if (response.status === 401) {
+            console.error('Authentication failed - redirecting to login');
+            window.location.href = '/login';
+          } else {
+            console.error('Failed to load notifications:', response.status);
+            const errorText = await response.text();
+            console.error('Error response:', errorText);
+            showCustomNotification('Failed to load notifications. Please refresh the page.', 'error');
+          }
+        } catch (error) {
+          console.error('Error loading notifications:', error);
+        }
+      }
+      
+      // Update unread count from API
+      async function updateUnreadCount() {
+        try {
+          const response = await fetch('/api/v1/notifications/unread-count', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json'
+            },
+            credentials: 'same-origin'
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            updateNotificationCount(data.unread_count);
+          }
+        } catch (error) {
+          console.error('Error updating unread count:', error);
+        }
+      }
+      
+      // Display notifications in the dropdown
+      function displayNotifications(notifications) {
+        console.log('Displaying notifications:', notifications);
+        const notificationsList = document.getElementById('notificationsList');
+        if (!notificationsList) {
+          console.error('notificationsList element not found');
+          return;
+        }
+        
+        if (notifications.length === 0) {
+          notificationsList.innerHTML = '<div class="notification-empty">No notifications</div>';
+          console.log('No notifications to display');
+          return;
+        }
+        
+        const html = notifications.map(notification => `
+          <div class="dropdown-item notification-item ${notification.is_read ? '' : 'unread'}" 
+               onclick="markNotificationRead(${notification.id})">
+            <div class="d-flex align-items-start">
+              <div class="notification-icon ${notification.notification_type}">
+                <i class="mdi mdi-${getNotificationIcon(notification.notification_type)}"></i>
+              </div>
+              <div class="notification-content">
+                <div class="notification-title">${notification.title}</div>
+                <div class="notification-message">${notification.message}</div>
+                <div class="notification-time">${formatNotificationTime(notification.created_at)}</div>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        
+        notificationsList.innerHTML = html;
+        console.log('Notifications HTML updated');
+      }
+      
+      // Get notification color based on type
+      function getNotificationColor(type) {
+        switch (type) {
+          case 'success': return 'success';
+          case 'warning': return 'warning';
+          case 'error': return 'danger';
+          default: return 'info';
+        }
+      }
+      
+      // Get notification icon based on type
+      function getNotificationIcon(type) {
+        switch (type) {
+          case 'success': return 'check-circle';
+          case 'warning': return 'alert-circle';
+          case 'error': return 'close-circle';
+          default: return 'information';
+        }
+      }
+      
+      // Format notification time
+      function formatNotificationTime(createdAt) {
+        const date = new Date(createdAt);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        return date.toLocaleDateString();
+      }
+      
+      // Update notification count badge
+      function updateNotificationCount(count) {
+        console.log('Updating notification count to:', count);
+        const countElement = document.getElementById('notificationCount');
+        if (!countElement) return;
+        
+        if (count > 0) {
+          countElement.textContent = count;
+          countElement.style.display = 'block';
+        } else {
+          countElement.style.display = 'none';
+        }
+        
+        // Update the last known count
+        lastNotificationCount = count;
+        console.log('Updated lastNotificationCount to:', lastNotificationCount);
+      }
+      
+      // Mark notification as read
+      async function markNotificationRead(notificationId) {
+        console.log('Marking notification as read:', notificationId);
+        try {
+          const response = await fetch(`/api/v1/notifications/${notificationId}/read`, {
+            method: 'PUT',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+          });
+          
+          if (response.ok) {
+            console.log('Notification marked as read successfully');
+            // Reload notifications to update the display
+            await loadNotifications();
+            // Also update the unread count
+            await updateUnreadCount();
+          } else {
+            console.error('Failed to mark notification as read:', response.status);
+          }
+        } catch (error) {
+          console.error('Error marking notification as read:', error);
+        }
+      }
+      
+      // Mark all notifications as read
+      async function markAllNotificationsRead() {
+        console.log('Marking all notifications as read');
+        try {
+          const response = await fetch('/api/v1/notifications/read-all', {
+            method: 'PUT',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+          });
+          
+          if (response.ok) {
+            console.log('All notifications marked as read successfully');
+            showCustomNotification('All notifications marked as read!', 'success');
+            // Force reload notifications to update the display
+            await loadNotifications();
+            // Update notification count to 0 since all are now read
+            updateNotificationCount(0);
+          } else {
+            const errorText = await response.text();
+            console.error('Mark all read failed:', errorText);
+            showCustomNotification('Failed to mark notifications as read. Please try again.', 'error');
+          }
+        } catch (error) {
+          console.error('Error marking all notifications as read:', error);
+          showCustomNotification('Error marking notifications as read. Please try again.', 'error');
+        }
+      }
+      
+      // Clear all notifications
+      async function clearAllNotifications() {
+        console.log('Clear all notifications called');
+        
+        // Show confirmation dialog
+        showCustomConfirm('Are you sure you want to delete all notifications?', 
+          async () => {
+            try {
+              const response = await fetch('/api/v1/notifications', {
+                method: 'DELETE',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                credentials: 'same-origin'
+              });
+              
+              console.log('Clear all response status:', response.status);
+              
+              if (response.ok) {
+                const result = await response.json();
+                console.log('Clear all success:', result);
+                showCustomNotification('All notifications deleted successfully!', 'success');
+                // Clear the notifications list immediately
+                const notificationsList = document.getElementById('notificationsList');
+                if (notificationsList) {
+                  notificationsList.innerHTML = '<div class="notification-empty">No notifications</div>';
+                }
+                // Update notification count to 0 since all are deleted
+                updateNotificationCount(0);
+              } else {
+                const errorText = await response.text();
+                console.error('Clear all failed:', errorText);
+                showCustomNotification('Failed to delete notifications. Please try again.', 'error');
+              }
+            } catch (error) {
+              console.error('Error clearing notifications:', error);
+              showCustomNotification('Error deleting notifications. Please try again.', 'error');
+            }
+          },
+          () => {
+            console.log('Clear all cancelled by user');
+          }
+        );
+      }
+      
+      // Start polling for new notifications
+      function startNotificationPolling() {
+        // Poll every 30 seconds for new notifications
+        notificationPollingInterval = setInterval(async () => {
+          // Only update if the page is visible and user hasn't manually updated recently
+          if (!document.hidden) {
+            try {
+              const response = await fetch('/api/v1/notifications/unread-count', {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+              });
+              
+              if (response.ok) {
+                const data = await response.json();
+                // Only update if the count has actually changed
+                if (data.unread_count !== lastNotificationCount) {
+                  console.log('Polling: updating count from', lastNotificationCount, 'to', data.unread_count);
+                  updateNotificationCount(data.unread_count);
+                }
+              }
+            } catch (error) {
+              console.error('Error polling notifications:', error);
+            }
+          }
+        }, 30000); // 30 seconds
+      }
+      
+      // Stop polling when page is hidden
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          if (notificationPollingInterval) {
+            clearInterval(notificationPollingInterval);
+          }
+        } else {
+          startNotificationPolling();
+        }
+      });
+    </script>
+  </body>
+</html>

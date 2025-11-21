@@ -1,0 +1,578 @@
+{% extends 'layouts/base.html' %}
+{% block title %}My Projects - Purple Admin{% endblock %}
+
+{% block content %}
+<style>
+/* Schedule details table styling */
+#scheduleDetailsTable {
+  font-size: 0.9rem;
+}
+
+#scheduleDetailsTable td {
+  vertical-align: middle;
+  padding: 0.75rem 0.5rem;
+}
+
+#scheduleDetailsTable th {
+  font-weight: 600;
+  color: #2c3e50;
+  border-bottom: 2px solid #dee2e6;
+}
+
+/* Pagination styling */
+#prevSchedulePageBtn, #nextSchedulePageBtn {
+  min-width: 40px;
+}
+
+#schedulePageIndicator {
+  font-weight: 600;
+  color: #6f42c1;
+}
+</style>
+<div class="content-wrapper">
+  <div class="row">
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card corona-gradient-card">
+        <div class="card-body py-0 px-0 px-sm-3">
+          <div class="row align-items-center">
+            <div class="col-4 col-sm-3 col-xl-2">
+              <img src="/static/assets/images/dashboard/Group126@2x.png" class="gradient-corona-img img-fluid" alt="">
+            </div>
+            <div class="col-5 col-sm-7 col-xl-8">
+              <div class="row">
+                <div class="col-12">
+                  <h4 class="mb-1 mb-sm-0">Welcome back, {{ username }}!</h4>
+                  <p class="mb-0 font-weight-normal d-none d-sm-block">Manage your social media projects and content.</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-3 col-sm-2 col-xl-2 text-center">
+              <a href="http://127.0.0.1:8000/api/v1/projects/create" class="btn btn-primary btn-rounded">Create Project</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex flex-row justify-content-between">
+            <h4 class="card-title mb-1">My Projects</h4>
+            <div>
+              <button id="prevPageBtn" class="btn btn-sm btn-outline-primary">&lt;</button>
+              <span id="pageIndicator" class="mx-2">1</span>
+              <button id="nextPageBtn" class="btn btn-sm btn-outline-primary">&gt;</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="preview-list" id="userProjectsContainer">
+                <!-- Projects will be loaded here via JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex flex-row justify-content-between">
+            <h4 class="card-title">Schedule Post Details</h4>
+            <div>
+              <button id="prevSchedulePageBtn" class="btn btn-sm btn-outline-primary">&lt;</button>
+              <span id="schedulePageIndicator" class="mx-2">1</span>
+              <button id="nextSchedulePageBtn" class="btn btn-sm btn-outline-primary">&gt;</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Project Name</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleDetailsTable">
+                <!-- Schedule details will be loaded here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <h4 class="card-title">Quick Actions</h4>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <a href="http://127.0.0.1:8000/api/v1/projects/create" class="btn btn-primary btn-block">
+                <i class="mdi mdi-plus mr-2"></i>New Project
+              </a>
+            </div>
+            <div class="col-6 mb-3">
+              <a href="{{ url_for('show_projects') }}" class="btn btn-outline-primary btn-block">
+                <i class="mdi mdi-folder mr-2"></i>View All
+              </a>
+            </div>
+            <div class="col-6 mb-3">
+              <a href="{{ url_for('dashboard') }}" class="btn btn-outline-info btn-block">
+                <i class="mdi mdi-view-dashboard mr-2"></i>Dashboard
+              </a>
+            </div>
+            <div class="col-6 mb-3">
+              <a href="{{ url_for('admin_panel') }}" class="btn btn-outline-warning btn-block">
+                <i class="mdi mdi-account-cog mr-2"></i>Admin Panel
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Schedule Modal -->
+<div class="modal fade" id="scheduleModal" tabindex="-1" role="dialog" aria-labelledby="scheduleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scheduleModalLabel">Schedule Project</h5>
+        <button type="button" class="close" onclick="closeScheduleModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleForm">
+          <div class="form-group">
+            <label for="scheduledTime">Schedule Time (IST)</label>
+            <input type="datetime-local" class="form-control" id="scheduledTime" name="scheduled_time" required style="color: #ffffff; background-color: #2c2e33;">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
+        <button type="button" id="scheduleProjectBtn" class="btn btn-primary" onclick="scheduleProject()">Schedule Project</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function authFetch(url, options = {}) {
+  return fetch(url, options).then(response => {
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = '/login';
+      return Promise.reject(new Error('Session expired. Redirecting to login.'));
+    }
+    return response;
+  });
+}
+
+const API_BASE = 'http://127.0.0.1:8000/api/v1';
+let currentPage = 1;
+const perPage = 5;
+let currentSchedulePage = 1;
+const schedulePerPage = 5;
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetchUserProjects(currentPage);
+  fetchScheduleDetails(1);
+});
+
+function fetchUserProjects(page = 1) {
+  authFetch(`${API_BASE}/projects?page=${page}&per_page=${perPage}`, {
+    credentials: 'include',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      const projects = data.projects || data;
+      const total = data.total || projects.length;
+      const totalPages = Math.ceil(total / perPage);
+      const container = document.getElementById('userProjectsContainer');
+      
+      if (container) {
+        container.innerHTML = '';
+        
+        if (projects.length === 0) {
+          container.innerHTML = `
+            <div class="text-center py-5">
+              <i class="mdi mdi-folder-open" style="font-size: 3rem; color: #6f42c1;"></i>
+              <h5 class="mt-3">No projects found</h5>
+              <p class="text-muted">Create your first project to get started!</p>
+              <a href="http://127.0.0.1:8000/api/v1/projects/create" class="btn btn-primary">
+                <i class="mdi mdi-plus mr-2"></i>Create Project
+              </a>
+            </div>
+          `;
+          return;
+        }
+        
+        projects.forEach(project => {
+          const div = document.createElement('div');
+          div.className = 'preview-item border-bottom';
+          div.innerHTML = `
+            <div class="preview-thumbnail">
+              <div class="preview-icon bg-primary">
+                <i class="mdi mdi-file-document"></i>
+              </div>
+            </div>
+            <div class="preview-item-content d-sm-flex flex-grow">
+              <div class="flex-grow">
+                <h6 class="preview-subject" style="color: #2c3e50 !important;">${project.name}</h6>
+                <p class="text-muted mb-0">${project.description || 'No description'}</p>
+              </div>
+              <div class="mr-auto text-sm-right pt-2 pt-sm-0">
+                <a href="${API_BASE}/projects/${project.id}/review" class="btn btn-sm btn-info">Review</a>
+                <button class="btn btn-sm btn-outline-primary" onclick="openScheduleModal(${project.id})">Schedule</button>
+              </div>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+      
+      document.getElementById('pageIndicator').textContent = page;
+      document.getElementById('nextPageBtn').disabled = (page >= totalPages);
+      document.getElementById('prevPageBtn').disabled = (page <= 1);
+    })
+    .catch(error => {
+      console.error("Error fetching projects:", error);
+      const container = document.getElementById('userProjectsContainer');
+      if (container) {
+        container.innerHTML = `
+          <div class="text-center py-5">
+            <i class="mdi mdi-alert-circle" style="font-size: 3rem; color: #dc3545;"></i>
+            <h5 class="mt-3">Error loading projects</h5>
+            <p class="text-muted">Please try again later.</p>
+          </div>
+        `;
+      }
+    });
+}
+
+function fetchScheduleDetails(page = 1) {
+  authFetch(`${API_BASE}/posts/scheduled_posts?page=${page}&per_page=${schedulePerPage}`, {
+    credentials: 'include',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      const scheduledPosts = data.items || data.scheduled_posts || data;
+      const total = data.total || scheduledPosts.length;
+      const totalPages = data.total_pages || Math.ceil(total / schedulePerPage);
+      const table = document.getElementById('scheduleDetailsTable');
+      
+      if (table) {
+        table.innerHTML = '';
+        
+        if (scheduledPosts.length === 0) {
+          table.innerHTML = `
+            <tr>
+              <td colspan="3" class="text-center text-muted">No scheduled posts found</td>
+            </tr>
+          `;
+          return;
+        }
+        
+        scheduledPosts.forEach(post => {
+          // Parse the scheduled time
+          const scheduledTime = new Date(post.scheduled_time || post.time || post.date);
+          
+          console.log('Original scheduled time:', post.scheduled_time || post.time || post.date);
+          console.log('Parsed Date object:', scheduledTime);
+          
+          // Convert to IST by adding 5 hours and 30 minutes (IST offset from UTC)
+          const istOffset = 5.5 * 60 * 60 * 1000; // 5.5 hours in milliseconds
+          const istTime = new Date(scheduledTime.getTime() + istOffset);
+          
+          console.log('IST converted time:', istTime);
+          
+          // Format date and time in IST (Indian Standard Time)
+          const date = istTime.toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          });
+          const time = istTime.toLocaleTimeString('en-IN', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true
+          });
+          
+          console.log('Formatted date:', date);
+          console.log('Formatted time:', time);
+          
+          table.innerHTML += `
+            <tr>
+              <td style="color: #2c3e50 !important;">${post.project_name || 'Unknown Project'}</td>
+              <td style="color: #2c3e50 !important;">${date}</td>
+              <td style="color: #2c3e50 !important;">${time}</td>
+            </tr>
+          `;
+        });
+      }
+      
+      // Update pagination controls
+      document.getElementById('schedulePageIndicator').textContent = page;
+      document.getElementById('nextSchedulePageBtn').disabled = (page >= totalPages);
+      document.getElementById('prevSchedulePageBtn').disabled = (page <= 1);
+    })
+    .catch(error => {
+      console.error("Error fetching schedule details:", error);
+      const table = document.getElementById('scheduleDetailsTable');
+      if (table) {
+        table.innerHTML = `
+          <tr>
+            <td colspan="3" class="text-center text-muted">Error loading schedule details</td>
+          </tr>
+        `;
+      }
+    });
+}
+
+document.getElementById('prevPageBtn').onclick = () => {
+  if (currentPage > 1) {
+    currentPage--;
+    fetchUserProjects(currentPage);
+  }
+};
+
+document.getElementById('nextPageBtn').onclick = () => {
+  currentPage++;
+  fetchUserProjects(currentPage);
+};
+
+// Schedule details pagination
+document.getElementById('prevSchedulePageBtn').onclick = () => {
+  if (currentSchedulePage > 1) {
+    currentSchedulePage--;
+    fetchScheduleDetails(currentSchedulePage);
+  }
+};
+
+document.getElementById('nextSchedulePageBtn').onclick = () => {
+  currentSchedulePage++;
+  fetchScheduleDetails(currentSchedulePage);
+};
+
+// Global variable to store current project ID
+let currentProjectId = null;
+
+// Schedule modal functions
+function openScheduleModal(projectId) {
+  currentProjectId = projectId;
+  
+  // First check if project already has a scheduled post
+  authFetch(`${API_BASE}/tasks/projects/${projectId}/schedule-status`, {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json'
+    },
+    credentials: 'include'
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.has_scheduled_post) {
+      // Project already has a scheduled post
+      const confirmReschedule = confirm(
+        `This project already has a scheduled post (ID: ${data.scheduled_post_id}).\n\n` +
+        `Would you like to reschedule it to a new time?`
+      );
+      
+      if (confirmReschedule) {
+        showScheduleModal(true); // true = reschedule mode
+      }
+    } else {
+      // No scheduled post, proceed normally
+      showScheduleModal(false); // false = new schedule mode
+    }
+  })
+  .catch(error => {
+    console.error('Error checking schedule status:', error);
+    // If we can't check status, proceed with normal scheduling
+    showScheduleModal(false);
+  });
+}
+
+function showScheduleModal(isReschedule = false) {
+  // Set default time to 1 hour from now
+  const now = new Date();
+  const oneHourLater = new Date(now.getTime());
+  
+  // Format for datetime-local input (YYYY-MM-DDTHH:MM)
+  const year = oneHourLater.getFullYear();
+  const month = String(oneHourLater.getMonth() + 1).padStart(2, '0');
+  const day = String(oneHourLater.getDate()).padStart(2, '0');
+  const hours = String(oneHourLater.getHours()).padStart(2, '0');
+  const minutes = String(oneHourLater.getMinutes()).padStart(2, '0');
+  
+  const timeString = `${year}-${month}-${day}T${hours}:${minutes}`;
+  document.getElementById('scheduledTime').value = timeString;
+  
+  // Update modal title and button text based on mode
+  const modalTitle = document.getElementById('scheduleModalLabel');
+  const scheduleBtn = document.getElementById('scheduleProjectBtn');
+  
+  if (isReschedule) {
+    modalTitle.textContent = 'Reschedule Project';
+    scheduleBtn.textContent = 'Reschedule Project';
+  } else {
+    modalTitle.textContent = 'Schedule Project';
+    scheduleBtn.textContent = 'Schedule Project';
+  }
+  
+  // Show modal using vanilla JavaScript
+  const modal = document.getElementById('scheduleModal');
+  if (modal) {
+    // Remove aria-hidden and set proper attributes
+    modal.removeAttribute('aria-hidden');
+    modal.setAttribute('aria-modal', 'true');
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    
+    // Add backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    backdrop.id = 'modalBackdrop';
+    document.body.appendChild(backdrop);
+    
+    // Focus on the input after modal is shown
+    setTimeout(() => {
+      const input = document.getElementById('scheduledTime');
+      if (input) {
+        input.focus();
+      }
+    }, 100);
+  } else {
+    console.error('Modal not found');
+  }
+}
+
+function closeScheduleModal() {
+  const modal = document.getElementById('scheduleModal');
+  if (modal) {
+    // Restore aria-hidden
+    modal.setAttribute('aria-hidden', 'true');
+    modal.removeAttribute('aria-modal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
+    document.body.classList.remove('modal-open');
+    
+    // Remove backdrop
+    const backdrop = document.getElementById('modalBackdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+    
+    // Reset current project ID
+    currentProjectId = null;
+  }
+}
+
+function scheduleProject() {
+  if (!currentProjectId) {
+    showCustomNotification('No project selected for scheduling.', 'error');
+    return;
+  }
+  
+  const scheduledTime = document.getElementById('scheduledTime').value;
+  if (!scheduledTime) {
+    showCustomNotification('Please select a schedule time.', 'error');
+    return;
+  }
+  
+  const scheduleBtn = document.getElementById('scheduleProjectBtn');
+  const isReschedule = scheduleBtn.textContent === 'Reschedule Project';
+  
+  // Show loading state
+  scheduleBtn.disabled = true;
+  scheduleBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>' + (isReschedule ? 'Rescheduling...' : 'Scheduling...');
+  
+  // Convert to IST string
+  const date = new Date(scheduledTime);
+  const istString = date.toISOString();
+  
+  console.log((isReschedule ? 'Rescheduling' : 'Scheduling') + ' project with time:', istString);
+  
+  // Choose endpoint based on whether it's a reschedule or new schedule
+  const endpoint = isReschedule ? 'reschedule' : 'schedule';
+  const method = isReschedule ? 'PUT' : 'POST';
+  
+  authFetch(`${API_BASE}/tasks/projects/${currentProjectId}/${endpoint}`, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify({
+      scheduled_time: istString
+    }),
+    credentials: 'include'
+  })
+  .then(response => {
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+    if (!response.ok) {
+      return response.json().then(data => {
+        console.log('Error response data:', data);
+        throw new Error(data.detail || data.message || 'Unknown error');
+      });
+    }
+    return response.text().then(text => {
+      console.log('Raw response text:', text);
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.error('Failed to parse JSON:', e);
+        throw new Error('Invalid JSON response from server');
+      }
+    });
+  })
+  .then(data => {
+    console.log('Response data:', data);
+    console.log('Data status:', data.status);
+    console.log('Data message:', data.message);
+    if (data.status === 'success' || data.status === 'scheduled' || data.status === 'rescheduled') {
+      console.log('Success case - scheduling was successful');
+      showCustomNotification(isReschedule ? 'Project rescheduled successfully!' : 'Project scheduled successfully!', 'success');
+      // Hide modal
+      try {
+        closeScheduleModal();
+      } catch (e) {
+        console.error('Error closing modal:', e);
+      }
+      // Refresh the projects list
+      try {
+        fetchUserProjects(currentPage);
+      } catch (e) {
+        console.error('Error refreshing projects:', e);
+      }
+    } else {
+      console.log('Error case - scheduling failed');
+      showCustomNotification('Failed to ' + (isReschedule ? 'reschedule' : 'schedule') + ' project: ' + (data.message || 'Unknown error'), 'error');
+    }
+  })
+  .catch(error => {
+    console.error('Error ' + (isReschedule ? 'rescheduling' : 'scheduling') + ' project:', error);
+    console.error('Error stack:', error.stack);
+    showCustomNotification('Error ' + (isReschedule ? 'rescheduling' : 'scheduling') + ' project: ' + error.message, 'error');
+  })
+  .finally(() => {
+    // Reset button state
+    scheduleBtn.disabled = false;
+    scheduleBtn.innerHTML = isReschedule ? 'Reschedule Project' : 'Schedule Project';
+  });
+}
+</script>
+{% endblock %} 

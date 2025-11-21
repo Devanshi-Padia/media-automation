@@ -1,0 +1,400 @@
+{% extends 'layouts/base.html' %}
+
+{% block content %}
+<style>
+/* Dark theme styling */
+.table-dark {
+    background-color: #2a2a2a !important;
+    color: white !important;
+}
+
+.table-dark th,
+.table-dark td {
+    border-color: #444 !important;
+    color: white !important;
+}
+
+.table-dark thead th {
+    background-color: #f8f9fa !important;
+    color: black !important;
+    border-color: #dee2e6 !important;
+}
+
+.table-dark tbody tr:hover {
+    background-color: #444 !important;
+    color: black !important;
+}
+
+.card {
+    background-color: #2a2a2a !important;
+    border: 1px solid #444 !important;
+}
+
+.card-header {
+    background-color: #333 !important;
+    border-bottom: 1px solid #444 !important;
+    color: white !important;
+}
+
+.card-title {
+    color: white !important;
+}
+
+h5 {
+    color: white !important;
+}
+
+/* Form styling */
+.form-control {
+    background-color: #444 !important;
+    border: 1px solid #666 !important;
+    color: white !important;
+}
+
+.form-control:focus {
+    background-color: #555 !important;
+    border-color: #888 !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25) !important;
+}
+
+.form-control::placeholder {
+    color: #ccc !important;
+}
+
+/* Browser-specific placeholder styling */
+.form-control::-webkit-input-placeholder {
+    opacity: 1 !important;
+    color: #ccc !important;
+}
+
+.form-control::-moz-placeholder {
+    opacity: 1 !important;
+    color: #ccc !important;
+}
+
+.form-control:-ms-input-placeholder {
+    opacity: 1 !important;
+    color: #ccc !important;
+}
+
+/* Remove number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+}
+
+.btn-outline-light {
+    color: white !important;
+    border-color: white !important;
+}
+
+.btn-outline-light:hover {
+    background-color: white !important;
+    color: black !important;
+}
+
+/* Table cell text overflow */
+.table td {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Label styling */
+label {
+    color: white !important;
+}
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Admin Panel</h4>
+                </div>
+                <div class="card-body">
+                    <!-- All Users Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>All Users</h5>
+                            <div class="table-responsive">
+                                <table class="table table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Username</th>
+                                            <th>Email</th>
+                                            <th>Superuser</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in users %}
+                                        <tr>
+                                            <td>{{ user.id }}</td>
+                                            <td>{{ user.username }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>{{ "Yes" if user.is_superuser else "No" }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Any Post Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>Schedule Any Post</h5>
+                            <form action="/admin_panel" method="post" id="scheduleForm">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="project_id">Project ID:</label>
+                                            <input type="number" class="form-control" id="project_id" name="project_id" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label for="scheduled_time">Scheduled Time:</label>
+                                            <input type="datetime-local" class="form-control" id="scheduled_time" name="scheduled_time" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            <button type="submit" class="btn btn-primary btn-block" id="scheduleProjectBtn">
+                                                <span class="btn-text">Schedule Project</span>
+                                                <span class="btn-loading" style="display: none;">
+                                                    <i class="fas fa-spinner fa-spin"></i> Scheduling...
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- All Projects Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5>All Projects</h5>
+                            <div class="mb-3" style="max-width: 300px;">
+                                <label for="projectFilter">Filter by User:</label>
+                                <select class="form-control" id="projectFilter" onchange="changeProjectFilter(this.value)">
+                                    <option value="">All Users</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}" {% if project_filter == user.id|string %}selected{% endif %}>{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Topic</th>
+                                            <th>Status</th>
+                                            <th>Social Medias</th>
+                                            <th>Content Type</th>
+                                            <th>User</th>
+                                            <th>User ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for project in projects %}
+                                        <tr data-user-id="{{ project.created_by_user_id }}">
+                                            <td>{{ project.id }}</td>
+                                            <td>{{ project.name }}</td>
+                                            <td title="{{ project.topic }}" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ project.topic[:30] }}{% if project.topic|length > 30 %}...{% endif %}</td>
+                                            <td>{{ project.status }}</td>
+                                            <td>{{ project.social_medias }}</td>
+                                            <td>{{ project.content_type }}</td>
+                                            <td>{{ project.user_username }}</td>
+                                            <td>{{ project.created_by_user_id }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination for Projects -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span id="projectPageIndicator">Page {{ project_page }} of {{ total_project_pages }}</span>
+                                </div>
+                                <div>
+                                    {% if project_page > 1 %}
+                                    <button onclick="changeProjectPage({{ project_page - 1 }})" class="btn btn-sm btn-outline-light">Previous</button>
+                                    {% endif %}
+                                    {% if project_page < total_project_pages %}
+                                    <button onclick="changeProjectPage({{ project_page + 1 }})" class="btn btn-sm btn-outline-light">Next</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scheduled Posts Section -->
+                    <div class="row">
+                        <div class="col-12">
+                            <h5>Scheduled Posts</h5>
+                            <div class="mb-3" style="max-width: 300px;">
+                                <label for="scheduledFilter">Filter by User:</label>
+                                <select class="form-control" id="scheduledFilter" onchange="changeScheduledFilter(this.value)">
+                                    <option value="">All Users</option>
+                                    {% for user in users %}
+                                    <option value="{{ user.id }}" {% if scheduled_filter == user.id|string %}selected{% endif %}>{{ user.username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-dark">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Project ID</th>
+                                            <th>Platforms</th>
+                                            <th>Scheduled Time</th>
+                                            <th>Status</th>
+                                            <th>User</th>
+                                            <th>User ID</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for scheduled_post in scheduled_posts %}
+                                        <tr data-user-id="{{ scheduled_post.user_id }}">
+                                            <td>{{ scheduled_post.id }}</td>
+                                            <td>{{ scheduled_post.project_id }}</td>
+                                            <td>{{ scheduled_post.platforms }}</td>
+                                            <td>{{ scheduled_post.scheduled_time }}</td>
+                                            <td>{{ scheduled_post.status }}</td>
+                                            <td>{{ scheduled_post.user_username }}</td>
+                                            <td>{{ scheduled_post.user_id }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination for Scheduled Posts -->
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span id="scheduledPageIndicator">Page {{ scheduled_page }} of {{ total_scheduled_pages }}</span>
+                                </div>
+                                <div>
+                                    {% if scheduled_page > 1 %}
+                                    <button onclick="changeScheduledPage({{ scheduled_page - 1 }})" class="btn btn-sm btn-outline-light">Previous</button>
+                                    {% endif %}
+                                    {% if scheduled_page < total_scheduled_pages %}
+                                    <button onclick="changeScheduledPage({{ scheduled_page + 1 }})" class="btn btn-sm btn-outline-light">Next</button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function authFetch(url, options = {}) {
+  return fetch(url, options).then(response => {
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = '/login';
+      return Promise.reject(new Error('Session expired. Redirecting to login.'));
+    }
+    return response;
+  });
+}
+
+function changeProjectFilter(value) {
+    const url = new URL(window.location);
+    url.searchParams.set('project_filter', value);
+    url.searchParams.set('project_page', '1'); // Reset to first page
+    
+    // Use pushState to avoid page jump to top
+    window.history.pushState({}, '', url.toString());
+    window.location.reload();
+}
+
+function changeScheduledFilter(value) {
+    const url = new URL(window.location);
+    url.searchParams.set('scheduled_filter', value);
+    url.searchParams.set('scheduled_page', '1'); // Reset to first page
+    
+    // Use pushState to avoid page jump to top
+    window.history.pushState({}, '', url.toString());
+    window.location.reload();
+}
+
+function changeProjectPage(page) {
+    const url = new URL(window.location);
+    url.searchParams.set('project_page', page);
+    
+    // Use pushState to avoid page jump to top
+    window.history.pushState({}, '', url.toString());
+    window.location.reload();
+}
+
+function changeScheduledPage(page) {
+    const url = new URL(window.location);
+    url.searchParams.set('scheduled_page', page);
+    
+    // Use pushState to avoid page jump to top
+    window.history.pushState({}, '', url.toString());
+    window.location.reload();
+}
+
+// Schedule form submission with loading state
+document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const button = document.getElementById('scheduleProjectBtn');
+    
+    // Show loading state using global functions
+    setButtonLoading(button, true);
+    showLoading('Scheduling Project...');
+    
+    // Submit form
+    const formData = new FormData(this);
+    authFetch('/admin_panel', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        showCustomNotification('Project scheduled successfully!');
+        // Reset form
+        this.reset();
+    })
+    .catch(error => {
+        showCustomNotification('Error scheduling project: ' + error.message, 'error');
+    })
+    .finally(() => {
+        // Hide loading state using global functions
+        setButtonLoading(button, false);
+        hideLoading();
+    });
+});
+</script>
+{% endblock %}

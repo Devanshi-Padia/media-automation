@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="shortcut icon" href="/static/assets/images/favicon.png" />
+
+    <title>
+        Flask Corona Dark - {% block title %}{% endblock %} | AppSeed
+    </title>
+
+    <link rel="stylesheet" href="/static/assets/vendors/mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="/static/assets/vendors/css/vendor.bundle.base.css">
+
+    <!-- Specific Plugin CSS goes HERE -->
+    {% block plugin_stylesheets %}{% endblock plugin_stylesheets %}
+
+    <!-- Layout styles -->
+    <link rel="stylesheet" href="/static/assets/css/style.css">
+    <!-- End layout styles -->
+
+    <!-- Specific CSS goes HERE -->
+    {% block stylesheets %}{% endblock stylesheets %}
+
+    <!-- Fix for white text on white background in form inputs -->
+    <style>
+    /* Ensure form inputs have visible text when typing - STRONG OVERRIDE */
+    .form-control,
+    .form-control:focus,
+    .form-control:active,
+    .p_input,
+    .p_input:focus,
+    .p_input:active,
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="number"],
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus,
+    input[type="text"]:active,
+    input[type="password"]:active,
+    input[type="email"]:active,
+    input[type="number"]:active {
+        color: #2c3e50 !important;
+        -webkit-text-fill-color: #2c3e50 !important;
+        background-color: #ffffff !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+    }
+    
+    /* Override any white text rules */
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    input[type="email"]:focus,
+    input[type="number"]:focus {
+        color: #2c3e50 !important;
+        -webkit-text-fill-color: #2c3e50 !important;
+        background-color: #ffffff !important;
+    }
+    
+    /* Ensure placeholder text is visible */
+    .form-control::placeholder,
+    .p_input::placeholder,
+    input[type="text"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="email"]::placeholder {
+        color: #6c757d !important;
+        opacity: 0.7;
+    }
+    
+    /* Override autofill styling */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px white inset !important;
+        -webkit-text-fill-color: #2c3e50 !important;
+        transition: background-color 5000s ease-in-out 0s;
+        color: #2c3e50 !important;
+        background-color: #ffffff !important;
+    }
+    
+    /* Force text color for all input states */
+    input {
+        color: #2c3e50 !important;
+        -webkit-text-fill-color: #2c3e50 !important;
+        background-color: #ffffff !important;
+    }
+    </style>
+
+  </head>
+  <body>
+    <div class="container-scroller">
+
+        {% block content %}{% endblock content %}
+
+    </div>
+    <!-- container-scroller -->
+
+    <script src="/static/assets/vendors/js/vendor.bundle.base.js"></script>
+
+    <!-- Specific Plugin JS goes HERE  -->
+    {% block plugin_javascripts %}{% endblock plugin_javascripts %}
+
+    <script src="/static/assets/js/off-canvas.js"></script>
+    <script src="/static/assets/js/hoverable-collapse.js"></script>
+    <script src="/static/assets/js/misc.js"></script>
+    <script src="/static/assets/js/settings.js"></script>
+    <script src="/static/assets/js/todolist.js"></script>
+
+    <!-- Specific Page JS goes HERE  -->
+    {% block javascripts %}{% endblock javascripts %}
+
+  </body>
+</html>

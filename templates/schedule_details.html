@@ -1,0 +1,66 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Schedule Post{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h4 class="card-title mb-4">Schedule Your Post</h4>
+        <form id="scheduleForm" method="post">
+          <div class="form-group">
+            <label for="scheduled_time">Scheduled Date and Time</label>
+            <input type="datetime-local" class="form-control" id="scheduled_time" name="scheduled_time" required>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Schedule</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function authFetch(url, options = {}) {
+  return fetch(url, options).then(response => {
+    if (response.status === 401 || response.status === 403) {
+      window.location.href = '/login';
+      return Promise.reject(new Error('Session expired. Redirecting to login.'));
+    }
+    return response;
+  });
+}
+
+document.getElementById('scheduleForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const scheduledTime = document.getElementById('scheduled_time').value;
+  // Convert local time to IST (UTC+5:30)
+  const localDate = new Date(scheduledTime);
+  const pad = n => n < 10 ? '0' + n : n;
+  const istOffset = '+05:30';
+  const istString = localDate.getFullYear() + '-' +
+      pad(localDate.getMonth() + 1) + '-' +
+      pad(localDate.getDate()) + 'T' +
+      pad(localDate.getHours()) + ':' +
+      pad(localDate.getMinutes()) + ':' +
+      pad(localDate.getSeconds()) + istOffset;
+  const projectId = {{ project_id }};
+  const response = await authFetch(`/api/v1/tasks/projects/${projectId}/schedule`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      scheduled_time: istString
+    })
+  });
+  const data = await response.json();
+  if (data.status === 'scheduled') {
+    showCustomNotification('Post scheduled successfully!', 'success');
+    window.location.href = 'http://127.0.0.1:8000/dashboard';
+  } else {
+    showCustomNotification('Failed to schedule post: ' + (data.detail || 'Unknown error'), 'error');
+  }
+});
+</script>
+{% endblock %}
