@@ -16,7 +16,6 @@ from ..models import *  # noqa: F403
 from .config import (
     AppSettings,
     ClientSideCacheSettings,
-    DatabaseSettings,
     EnvironmentOption,
     EnvironmentSettings,
     RedisCacheSettings,
