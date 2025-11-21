@@ -21,7 +21,15 @@ parsed = urllib.parse.urlparse(raw_url)
 query = urllib.parse.parse_qs(parsed.query)
 
 # asyncpg expects ssl=true
-query["ssl"] = ["true"]
+
+if "sslmode" in query:
+    query.pop("sslmode")
+if "ssl" in query:
+    query.pop("ssl")
+
+# ADD correct asyncpg SSL
+query["sslmode"] = ["require"]
+
 
 clean_query = urllib.parse.urlencode(query, doseq=True)
 
