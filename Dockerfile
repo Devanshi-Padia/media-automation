@@ -16,6 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy your app code
 COPY src ./src
 COPY static ./static
+COPY public ./public
 COPY run_app.py .
 
 # Expose Render port
